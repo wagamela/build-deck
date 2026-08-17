@@ -25,10 +25,13 @@ function App() {
       </header>
       <div className="relative flex flex-1 items-center justify-center overflow-hidden px-4 pb-2 pt-4">
         <DiscoveryDeck />
+        <span className="pointer-events-none absolute top-1/2 left-[calc((100%_-_min(94vw,28.5rem))/4)] hidden -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.2em] text-ink/50 lg:block">
+          Swipe left to skip
+        </span>
+        <span className="pointer-events-none absolute top-1/2 right-[calc((100%_-_min(94vw,28.5rem))/4)] hidden translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-sm font-semibold uppercase tracking-[0.2em] text-ink/50 lg:block">
+          Swipe right to like
+        </span>
       </div>
-      <footer className="pb-5 pt-2 text-center text-xs font-medium text-ink/50">
-        Swipe right to like · swipe left to skip
-      </footer>
     </main>
   )
 }
