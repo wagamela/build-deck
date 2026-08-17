@@ -19,7 +19,7 @@ function Wordmark() {
 
 function App() {
   return (
-    <main className="flex h-dvh flex-col overflow-hidden bg-gradient-to-br from-mint-pale via-mint-light to-lavender-light text-ink">
+    <main className="app-bg flex h-dvh flex-col overflow-hidden text-ink">
       <header className="px-6 pt-6">
         <Wordmark />
       </header>
