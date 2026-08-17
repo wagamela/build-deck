@@ -4,12 +4,14 @@ import type {
   TransitionEvent as ReactTransitionEvent,
 } from 'react'
 import { projects } from '../data/projects'
+import CardBack from './CardBack'
 import SwipeCard from './SwipeCard'
 
 const SWIPE_THRESHOLD = 100
 const TILT_PER_PX = 0.08
 const MAX_TILT = 18
 const FLYOUT_MS = 600
+const BACK_COLORS = ['#cef5d3', '#c7caeb', '#dffcd9', '#d8d5ed', '#b3b6e3']
 
 interface DragState {
   pointerId: number
@@ -25,12 +27,15 @@ export default function DiscoveryDeck() {
   const [dragging, setDragging] = useState(false)
   const dragRef = useRef<DragState | null>(null)
   const leavingRef = useRef<'left' | 'right' | null>(null)
+  const draggedRef = useRef(false)
 
   useEffect(() => {
     leavingRef.current = leaving
   }, [leaving])
 
+  const total = projects.length
   const topIndex = counter % projects.length
+  const position = topIndex + 1
   const stack = [0, 1, 2].map((offset) => ({
     project: projects[(topIndex + offset) % projects.length],
     key: counter + offset,
@@ -46,6 +51,7 @@ export default function DiscoveryDeck() {
     setDx(0)
     setDy(0)
     setLeaving(null)
+    draggedRef.current = false
   }
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
@@ -55,6 +61,7 @@ export default function DiscoveryDeck() {
       startX: event.clientX,
       startY: event.clientY,
     }
+    draggedRef.current = true
     setDragging(true)
     event.currentTarget.setPointerCapture(event.pointerId)
   }
@@ -112,13 +119,14 @@ export default function DiscoveryDeck() {
       : 'transition-transform duration-300 ease-spring'
 
   return (
-    <div className="relative h-[min(70vh,34rem)] w-[min(92vw,26rem)] select-none">
+    <div className="relative h-[min(74vh,38rem)] w-[min(94vw,28.5rem)] select-none">
       {stack.map(({ project, key, offset }) => {
         if (offset === 0) {
+          const arriveClass = leaving || draggedRef.current ? '' : 'animate-card-arrive'
           return (
             <div
               key={key}
-              className={`absolute inset-0 z-20 touch-none will-change-transform ${topTransitionClass}`}
+              className={`absolute inset-0 z-20 touch-none will-change-transform ${arriveClass} ${topTransitionClass}`}
               style={{ transform }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
@@ -126,33 +134,37 @@ export default function DiscoveryDeck() {
               onPointerCancel={handlePointerCancel}
               onTransitionEnd={handleTransitionEnd}
             >
-              <SwipeCard project={project} />
+              <SwipeCard project={project} position={position} total={total} />
               <div
-                className="pointer-events-none absolute right-4 top-6 z-10 rounded-lg border-4 border-emerald-500 bg-white/85 px-3 py-1 text-2xl font-extrabold tracking-wide text-emerald-500"
-                style={{ transform: 'rotate(14deg)', opacity: likeProgress }}
+                className="pointer-events-none absolute right-4 top-5 z-10 rounded-[4px] border-[3px] border-emerald-500 bg-white/90 px-3 py-1 text-base font-bold uppercase tracking-[0.2em] text-emerald-500 outline-2 outline-solid outline-offset-[-7px] outline-emerald-500"
+                style={{ transform: 'rotate(12deg)', opacity: likeProgress }}
               >
-                LIKE
+                Like
               </div>
               <div
-                className="pointer-events-none absolute left-4 top-6 z-10 rounded-lg border-4 border-rose-500 bg-white/85 px-3 py-1 text-2xl font-extrabold tracking-wide text-rose-500"
-                style={{ transform: 'rotate(-14deg)', opacity: skipProgress }}
+                className="pointer-events-none absolute left-4 top-5 z-10 rounded-[4px] border-[3px] border-rose-500 bg-white/90 px-3 py-1 text-base font-bold uppercase tracking-[0.2em] text-rose-500 outline-2 outline-solid outline-offset-[-7px] outline-rose-500"
+                style={{ transform: 'rotate(-12deg)', opacity: skipProgress }}
               >
-                SKIP
+                Skip
               </div>
             </div>
           )
         }
 
         const scale = offset === 1 ? 0.95 : 0.9
-        const yOffset = offset === 1 ? '8px' : '16px'
+        const yOffset = offset === 1 ? '10px' : '22px'
+        const rotation = offset === 1 ? -2.5 : 2.5
         const zIndex = offset === 1 ? 10 : 0
         return (
           <div
             key={key}
             className="pointer-events-none absolute inset-0"
-            style={{ transform: `scale(${scale}) translateY(${yOffset})`, opacity: offset === 2 ? 0.6 : 0.85, zIndex }}
+            style={{
+              transform: `translateY(${yOffset}) rotate(${rotation}deg) scale(${scale})`,
+              zIndex,
+            }}
           >
-            <SwipeCard project={project} />
+            <CardBack color={BACK_COLORS[(counter + offset) % BACK_COLORS.length]} />
           </div>
         )
       })}

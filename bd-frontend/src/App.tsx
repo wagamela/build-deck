@@ -10,7 +10,7 @@ function Wordmark() {
         </svg>
       </div>
       <div className="leading-tight">
-        <h1 className="text-[1.6rem] font-extrabold tracking-tight text-ink">BuildDeck</h1>
+        <h1 className="font-display text-[1.7rem] font-bold tracking-tight text-ink">BuildDeck</h1>
         <p className="text-xs font-medium text-ink/55">Discover what developers are building</p>
       </div>
     </div>
