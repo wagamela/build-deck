@@ -78,6 +78,29 @@
     180px 180px;
 }
 
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(206 211 235 / 0.35) transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgb(206 211 235 / 0.35);
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgb(199 202 235 / 0.6);
+}
+
 html,
 body {
   height: 100%;

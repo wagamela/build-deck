@@ -167,7 +167,7 @@ function PastCards({ history, onRevisit }: PastCardsProps) {
           Cards you swipe land here. Click one to flip it back.
         </p>
       ) : (
-        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+        <div className="sidebar-scroll min-h-0 flex-1 overflow-y-auto pr-1">
           <ol className="flex flex-col gap-0.5">
             {[...history].reverse().map((entry) => (
               <li key={entry.id}>
