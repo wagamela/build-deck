@@ -138,14 +138,6 @@ export default function SwipeCard({ project, position, total }: SwipeCardProps) 
         </div>
 
         <div className="mt-6 flex min-h-24 flex-1 flex-col overflow-hidden rounded-[0.9rem] border border-ink/[0.09] bg-white">
-          <div className="flex h-8 shrink-0 items-center gap-1.5 border-b border-ink/[0.06] bg-mint-pale/70 px-3.5">
-            <span className="h-2 w-2 rounded-full bg-ink/15" aria-hidden="true" />
-            <span className="h-2 w-2 rounded-full bg-ink/15" aria-hidden="true" />
-            <span className="h-2 w-2 rounded-full bg-ink/15" aria-hidden="true" />
-            <span className="ml-2 truncate font-mono text-[0.58rem] text-ink/45">
-              {project.url}
-            </span>
-          </div>
           <ProjectPreview project={project} />
         </div>
 

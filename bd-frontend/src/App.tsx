@@ -351,22 +351,12 @@ function App() {
         </aside>
 
         <section className="relative flex min-h-0 flex-col items-center justify-center gap-7">
-          <div className="relative z-0">
-            <div
-              className="pointer-events-none absolute -inset-11 -z-10 rounded-[3rem]"
-              style={{
-                background:
-                  "radial-gradient(closest-side, rgb(199 202 235 / 0.2), rgb(179 182 227 / 0.07) 48%, transparent 72%)",
-              }}
-              aria-hidden="true"
-            />
-            <DiscoveryDeck
-              deck={projects}
-              controlsRef={controlsRef}
-              onDecision={handleDecision}
-              onActiveChange={handleActiveChange}
-            />
-          </div>
+          <DiscoveryDeck
+            deck={projects}
+            controlsRef={controlsRef}
+            onDecision={handleDecision}
+            onActiveChange={handleActiveChange}
+          />
           <ActionBar
             onLike={() => controlsRef.current?.like()}
             onPass={() => controlsRef.current?.skip()}
