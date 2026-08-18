@@ -60,6 +60,12 @@
   background-color: var(--color-background);
 }
 
+.debug-outlines,
+.debug-outlines * {
+  outline: 1px dashed rgb(94 106 210 / 0.35);
+  outline-offset: -1px;
+}
+
 .sidebar-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--color-line) transparent;
