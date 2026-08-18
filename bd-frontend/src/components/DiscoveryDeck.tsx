@@ -10,8 +10,8 @@ import SwipeCard from './SwipeCard'
 const SWIPE_THRESHOLD = 100
 const TILT_PER_PX = 0.08
 const MAX_TILT = 18
-const FLYOUT_MS = 600
-const BACK_COLORS = ['#cef5d3', '#c7caeb', '#dffcd9', '#d8d5ed', '#b3b6e3']
+const FLYOUT_MS = 450
+const BACK_COLORS = ['#17171d', '#141419', '#191922', '#131318', '#16161c']
 
 export interface DeckControls {
   like: () => void
@@ -165,7 +165,7 @@ export default function DiscoveryDeck({
         : `translate(${dx}px, ${dy}px) rotate(${tilt}deg)`
 
   const topTransitionClass = leaving
-    ? 'transition-transform duration-500 ease-out'
+    ? 'transition-transform duration-300 ease-out'
     : dragging
       ? ''
       : 'transition-transform duration-300 ease-spring'
@@ -188,13 +188,13 @@ export default function DiscoveryDeck({
             >
               <SwipeCard project={project} position={position} total={total} />
               <div
-                className="pointer-events-none absolute right-4 top-5 z-10 rounded-[4px] border-[3px] border-emerald-500 bg-white/90 px-3 py-1 text-base font-bold uppercase tracking-[0.2em] text-emerald-500 outline-2 outline-solid outline-offset-[-7px] outline-emerald-500"
+                className="pointer-events-none absolute right-4 top-5 z-10 rounded-md border-2 border-success bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-success"
                 style={{ transform: 'rotate(12deg)', opacity: likeProgress }}
               >
                 Like
               </div>
               <div
-                className="pointer-events-none absolute left-4 top-5 z-10 rounded-[4px] border-[3px] border-rose-500 bg-white/90 px-3 py-1 text-base font-bold uppercase tracking-[0.2em] text-rose-500 outline-2 outline-solid outline-offset-[-7px] outline-rose-500"
+                className="pointer-events-none absolute left-4 top-5 z-10 rounded-md border-2 border-error bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-error"
                 style={{ transform: 'rotate(-12deg)', opacity: skipProgress }}
               >
                 Skip

@@ -18,7 +18,7 @@ function DeckMark({ className }: { className?: string }) {
         width="12.5"
         height="17"
         rx="3"
-        fill="#c7caeb"
+        fill="#6e79d6"
         opacity="0.9"
         transform="rotate(-8 6.2 3)"
       />
@@ -28,7 +28,7 @@ function DeckMark({ className }: { className?: string }) {
         width="12.5"
         height="17"
         rx="3"
-        fill="#cef5d3"
+        fill="#5e6ad2"
         transform="rotate(5 4.9 4.8)"
       />
     </svg>
@@ -125,15 +125,42 @@ function LinkedInMark({ className }: { className?: string }) {
   );
 }
 
+function SwipeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M5.5 11.5 2 8l3.5-3.5" />
+      <path d="M10.5 11.5 14 8l-3.5-3.5" />
+      <path d="M2 8h12" />
+    </svg>
+  );
+}
+
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="flex h-5 min-w-5 items-center justify-center rounded-full border border-line bg-surface px-1.5 font-mono text-[11px] leading-none text-muted">
+      {children}
+    </kbd>
+  );
+}
+
 function Wordmark() {
   return (
-    <div className="flex items-center gap-3.5">
-      <DeckMark className="h-10 w-10 drop-shadow-[0_10px_18px_rgb(0_0_0/0.45)]" />
+    <div className="flex items-center gap-3">
+      <DeckMark className="h-9 w-9" />
       <div className="leading-none">
-        <h1 className="font-display text-[1.55rem] font-bold tracking-tight text-frost">
+        <h1 className="font-display text-[1.4rem] text-text">
           Build<span className="font-medium italic">Deck</span>
         </h1>
-        <p className="eyebrow mt-2 text-mist">
+        <p className="mt-1.5 text-xs text-muted">
           Discover what developers are building
         </p>
       </div>
@@ -155,15 +182,15 @@ interface PastCardsProps {
 
 function PastCards({ history, onRevisit }: PastCardsProps) {
   return (
-    <div className="flex h-full w-full flex-col rounded-2xl border border-table-line bg-table-raised/40 p-3">
+    <div className="flex h-full w-full flex-col rounded-lg border border-line bg-neutral p-3">
       <div className="flex items-center justify-between px-2 pb-3 pt-1">
-        <span className="eyebrow text-mist">Past cards</span>
-        <span className="font-index text-[0.6rem] text-dusk">
+        <span className="eyebrow text-muted">Past cards</span>
+        <span className="font-mono text-[0.7rem] text-muted/60">
           {String(history.length).padStart(2, "0")}
         </span>
       </div>
       {history.length === 0 ? (
-        <p className="px-2 font-index text-[0.6rem] leading-relaxed text-dusk">
+        <p className="px-2 font-mono text-[0.7rem] leading-relaxed text-muted/60">
           Cards you swipe land here. Click one to flip it back.
         </p>
       ) : (
@@ -174,19 +201,19 @@ function PastCards({ history, onRevisit }: PastCardsProps) {
                 <button
                   type="button"
                   onClick={() => onRevisit(entry.index)}
-                  className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors duration-150 hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-lavender-light"
+                  className="group flex h-9 w-full items-center gap-3 rounded-md px-3 text-left transition-colors duration-100 hover:bg-surface focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
                 >
-                  <span className="font-index text-[0.6rem] text-dusk">
+                  <span className="font-mono text-[0.7rem] text-muted/60">
                     {String(entry.index + 1).padStart(2, "0")}
                   </span>
-                  <span className="truncate text-[0.82rem] font-medium text-frost/75 transition-colors group-hover:text-frost">
+                  <span className="truncate text-[13px] font-medium text-text/70 transition-colors group-hover:text-text">
                     {entry.name}
                   </span>
                   <span
                     className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full"
                     style={{
                       backgroundColor:
-                        entry.direction === "right" ? "#cef5d3" : "#e29a94",
+                        entry.direction === "right" ? "#3dd68c" : "#eb5757",
                     }}
                     aria-hidden="true"
                   />
@@ -202,24 +229,24 @@ function PastCards({ history, onRevisit }: PastCardsProps) {
 
 function ProjectPanel() {
   return (
-    <div className="flex w-full flex-col rounded-2xl border border-table-line bg-table-raised/40 p-4">
-      <span className="eyebrow text-mist">GitHub</span>
+    <div className="flex w-full flex-col rounded-lg border border-line bg-neutral p-4">
+      <span className="eyebrow text-muted">GitHub</span>
       <a
         href={BUILDDECK_REPO}
         target="_blank"
         rel="noreferrer"
-        className="group mt-3 flex h-11 items-center justify-between gap-2 rounded-lg border border-table-line bg-white/[0.03] px-3 transition-colors duration-150 hover:border-lavender-light/40 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-lavender-light"
+        className="group mt-3 flex h-9 items-center justify-between gap-2 rounded-md border border-line bg-surface/40 px-3 transition-colors duration-100 hover:border-muted focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
       >
         <span className="flex min-w-0 items-center gap-2">
-          <GitHubMark className="h-4 w-4 shrink-0 text-mist" />
-          <span className="truncate text-sm font-medium text-frost">
+          <GitHubMark className="h-4 w-4 shrink-0 text-muted" />
+          <span className="truncate text-[13px] font-medium text-text">
             BuildDeck
           </span>
         </span>
-        <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-mist transition-colors duration-150 group-hover:text-frost" />
+        <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted transition-colors duration-100 group-hover:text-text" />
       </a>
 
-      <span className="eyebrow mt-4 border-t border-table-line pt-3 text-dusk">
+      <span className="eyebrow mt-4 border-t border-line pt-3 text-muted/60">
         Find me
       </span>
       <div className="mt-2 flex items-center gap-2">
@@ -228,7 +255,7 @@ function ProjectPanel() {
           target="_blank"
           rel="noreferrer"
           aria-label="My GitHub"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-table-line text-mist transition-colors duration-150 hover:border-lavender-light/40 hover:text-frost focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-lavender-light"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-line text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
         >
           <GitHubMark className="h-4 w-4" />
         </a>
@@ -237,7 +264,7 @@ function ProjectPanel() {
           target="_blank"
           rel="noreferrer"
           aria-label="My X"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-table-line text-mist transition-colors duration-150 hover:border-lavender-light/40 hover:text-frost focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-lavender-light"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-line text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
         >
           <XMark className="h-4 w-4" />
         </a>
@@ -246,7 +273,7 @@ function ProjectPanel() {
           target="_blank"
           rel="noreferrer"
           aria-label="My LinkedIn"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-table-line text-mist transition-colors duration-150 hover:border-lavender-light/40 hover:text-frost focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-lavender-light"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-line text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
         >
           <LinkedInMark className="h-4 w-4" />
         </a>
@@ -262,28 +289,38 @@ interface ActionBarProps {
 
 function ActionBar({ onLike, onPass }: ActionBarProps) {
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col items-center gap-3">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onPass}
-          className="flex h-12 items-center gap-2.5 rounded-full border border-blush/50 bg-blush/5 px-7 text-sm font-semibold text-blush transition-all duration-200 hover:border-blush/80 hover:bg-blush/15 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-lavender-light active:scale-[0.97]"
+          className="flex h-9 items-center gap-2 rounded-md border border-line bg-transparent px-4 text-[13px] font-medium text-text transition-colors duration-100 hover:border-muted hover:bg-surface focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-[0.97]"
         >
-          <ArrowIcon direction="left" className="h-4 w-4" />
+          <ArrowIcon direction="left" className="h-4 w-4 text-muted" />
           Pass
         </button>
         <button
           type="button"
           onClick={onLike}
-          className="flex h-12 items-center gap-2.5 rounded-full bg-mint px-7 text-sm font-semibold text-ink transition-all duration-200 hover:bg-mint-light focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-lavender-light active:scale-[0.97]"
+          className="flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-[13px] font-medium text-white transition-colors duration-100 hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-[0.97]"
         >
           Like
           <ArrowIcon direction="right" className="h-4 w-4" />
         </button>
       </div>
-      <p className="hidden font-index text-[0.58rem] tracking-wide text-dusk sm:block">
-        swipe the card, or press left / right
-      </p>
+      <div className="flex items-center gap-4 text-[11px] text-muted">
+        <span className="flex items-center gap-1.5">
+          <SwipeIcon className="h-3.5 w-3.5" />
+          swipe the card
+        </span>
+        <span className="h-3 w-px bg-line" aria-hidden="true" />
+        <span className="flex items-center gap-1.5">
+          <Kbd>←</Kbd> pass
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Kbd>→</Kbd> like
+        </span>
+      </div>
     </div>
   );
 }
@@ -336,10 +373,10 @@ function App() {
   const total = projects.length;
 
   return (
-    <main className="app-bg flex h-dvh flex-col overflow-hidden text-frost">
-      <header className="flex items-center justify-between px-5 pt-5 sm:px-8 lg:px-10">
+    <main className="app-bg flex h-dvh flex-col overflow-hidden text-text">
+      <header className="flex items-center justify-between px-5 pt-6 sm:px-8 lg:px-10">
         <Wordmark />
-        <span className="eyebrow text-mist">
+        <span className="font-mono text-[0.75rem] text-muted">
           deck {String(activeIndex + 1).padStart(2, "0")} /{" "}
           {String(total).padStart(2, "0")}
         </span>

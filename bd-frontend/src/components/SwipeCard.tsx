@@ -40,16 +40,6 @@ function formatCount(count: number) {
   return String(count)
 }
 
-const MARK_TINTS = ['#dffcd9', '#d8d5ed', '#f1ffe8', '#c7caeb', '#cef5d3', '#b3b6e3']
-
-function tintFor(name: string) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash * 31 + name.charCodeAt(i)) | 0
-  }
-  return MARK_TINTS[Math.abs(hash) % MARK_TINTS.length]
-}
-
 function ProjectPreview({ project }: { project: Project }) {
   return (
     <div className="relative min-h-0 flex-1">
@@ -60,24 +50,21 @@ function ProjectPreview({ project }: { project: Project }) {
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div
-          className="absolute inset-0 overflow-hidden"
-          style={{ backgroundColor: tintFor(project.name) }}
-        >
+        <div className="absolute inset-0 overflow-hidden bg-surface">
           <div
-            className="absolute inset-0 opacity-40"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage:
-                'linear-gradient(to right, rgb(255 255 255 / 0.55) 1px, transparent 1px), linear-gradient(to bottom, rgb(255 255 255 / 0.55) 1px, transparent 1px)',
-              backgroundSize: '22px 22px',
+                'linear-gradient(to right, var(--color-line) 1px, transparent 1px), linear-gradient(to bottom, var(--color-line) 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
             }}
             aria-hidden="true"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-            <span className="font-display text-[2.75rem] font-semibold leading-none text-ink/60">
+            <span className="text-[2.5rem] font-semibold leading-none text-secondary/60">
               {project.name.charAt(0)}
             </span>
-            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-ink/45">
+            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-muted/70">
               {project.category}
             </span>
           </div>
@@ -107,72 +94,62 @@ interface SwipeCardProps {
 }
 
 export default function SwipeCard({ project, position, total }: SwipeCardProps) {
-  const titleSize =
-    project.name.length >= 9
-      ? 'text-[2.2rem]'
-      : project.name.length >= 7
-        ? 'text-[2.6rem]'
-        : 'text-[3rem]'
-
   return (
-    <article className="flex h-full w-full flex-col overflow-hidden rounded-[1.5rem] border border-ink/[0.07] bg-paper shadow-deck">
-      <div className="flex min-h-0 flex-1 flex-col px-7 pb-5 pt-6">
+    <article className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-line bg-neutral">
+      <div className="flex min-h-0 flex-1 flex-col px-6 pb-4 pt-5">
         <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1.5 text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-ink/60">
-            <GitHubMark className="h-3.5 w-3.5 text-ink/70" />
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
+            <GitHubMark className="h-3.5 w-3.5 text-muted" />
             {project.category}
           </span>
-          <span className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-ink/45">
+          <span className="font-mono text-[0.7rem] text-muted/60">
             {String(position).padStart(2, '0')} / {String(total).padStart(2, '0')}
           </span>
         </div>
 
-        <div className="mt-7">
-          <p className="text-xs font-medium tracking-[0.14em] text-ink/60">by {project.owner}</p>
-          <h2
-            className={`mt-1.5 font-display text-ink ${titleSize}`}
-            style={{ fontWeight: 650, lineHeight: 1.02, letterSpacing: '-0.02em', textWrap: 'balance' }}
-          >
+        <div className="mt-5">
+          <p className="text-xs font-medium text-muted">by {project.owner}</p>
+          <h2 className="mt-1 font-display text-[1.75rem] leading-tight text-text">
             {project.name}
           </h2>
         </div>
 
-        <div className="mt-6 flex min-h-24 flex-1 flex-col overflow-hidden rounded-[0.9rem] border border-ink/[0.09] bg-white">
+        <div className="mt-4 flex min-h-24 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface">
           <ProjectPreview project={project} />
         </div>
 
-        <div className="mt-5 flex items-center gap-6">
+        <div className="mt-4 flex items-center gap-5">
           <div>
-            <p className="flex items-center gap-1.5 text-[1.25rem] font-semibold text-ink">
-              <StarIcon className="h-[1em] w-[1em] text-ink/65" />
+            <p className="flex items-center gap-1.5 text-lg font-semibold text-text">
+              <StarIcon className="h-4 w-4 text-muted" />
               {formatCount(project.stars)}
             </p>
-            <p className="mt-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-ink/60">
+            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
               Stars
             </p>
           </div>
-          <span className="h-8 w-px bg-ink/10" aria-hidden="true" />
+          <span className="h-6 w-px bg-line" aria-hidden="true" />
           <div>
-            <p className="flex items-center gap-1.5 text-[1.25rem] font-semibold text-ink">
-              <ForkIcon className="h-[1em] w-[1em] text-ink/65" />
+            <p className="flex items-center gap-1.5 text-lg font-semibold text-text">
+              <ForkIcon className="h-4 w-4 text-muted" />
               {formatCount(project.forks)}
             </p>
-            <p className="mt-0.5 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-ink/60">
+            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
               Forks
             </p>
           </div>
         </div>
 
-        <p className="mt-5 line-clamp-3 font-display text-[1.05rem] leading-[1.55] text-ink/75">
+        <p className="mt-4 line-clamp-3 text-[13px] leading-relaxed text-muted">
           {project.description}
         </p>
 
-        <div className="mt-auto pt-5">
+        <div className="mt-auto pt-4">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
             {project.languages.map((language) => (
               <span
                 key={language.name}
-                className="flex items-center gap-1.5 text-xs font-medium text-ink/70"
+                className="flex items-center gap-1.5 text-xs font-medium text-muted"
               >
                 <span
                   className="h-2 w-2 rounded-full"
@@ -184,7 +161,7 @@ export default function SwipeCard({ project, position, total }: SwipeCardProps) 
             ))}
           </div>
           <div
-            className="mt-3 flex h-1 w-full overflow-hidden rounded-full"
+            className="mt-3 flex h-1 w-full overflow-hidden rounded-full bg-surface"
             role="img"
             aria-label={`Language mix: ${project.languages.map((language) => `${language.name} ${language.share}%`).join(', ')}`}
           >
@@ -203,13 +180,11 @@ export default function SwipeCard({ project, position, total }: SwipeCardProps) 
         href={project.url}
         target="_blank"
         rel="noreferrer"
-        className="group flex h-14 shrink-0 cursor-pointer items-center justify-between bg-ink px-7 text-mint-pale transition-colors duration-200 hover:bg-[#31354a] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-6px] focus-visible:outline-lavender-light"
+        className="group flex h-10 shrink-0 cursor-pointer items-center justify-center gap-2.5 border-t border-line bg-primary text-sm font-medium text-white transition-colors duration-100 hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-4px] focus-visible:outline-primary"
       >
-        <span className="flex items-center gap-2.5 text-sm font-semibold">
-          <GitHubMark className="h-4 w-4" />
-          View on GitHub
-        </span>
-        <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        <GitHubMark className="h-4 w-4" />
+        View on GitHub
+        <ArrowUpRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
       </a>
     </article>
   )
