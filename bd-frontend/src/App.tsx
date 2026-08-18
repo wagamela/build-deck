@@ -203,7 +203,7 @@ function PastCards({ history, onRevisit }: PastCardsProps) {
 function ProjectPanel() {
   return (
     <div className="flex w-full flex-col rounded-2xl border border-table-line bg-table-raised/40 p-4">
-      <span className="eyebrow text-mist">This project</span>
+      <span className="eyebrow text-mist">GitHub</span>
       <a
         href={BUILDDECK_REPO}
         target="_blank"
