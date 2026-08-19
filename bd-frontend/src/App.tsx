@@ -3,6 +3,7 @@ import DiscoveryDeck, { type DeckControls } from "./components/DiscoveryDeck";
 import { projects } from "./data/projects";
 
 const BUILDDECK_REPO = "https://github.com/wagamela/build-deck";
+const KEYBOARD_COOLDOWN_MS = 500;
 
 function DeckMark({ className }: { className?: string }) {
   return (
@@ -601,6 +602,7 @@ function App() {
   const [outlines, setOutlines] = useState(false);
   const historyIdRef = useRef(0);
   const controlsRef = useRef<DeckControls | null>(null);
+  const lastKeyActionRef = useRef(0);
 
   const dismissIntro = useCallback(() => {
     window.sessionStorage.setItem("bd-intro-seen", "1");
@@ -669,13 +671,20 @@ function App() {
       if (isTyping || event.ctrlKey || event.metaKey || event.altKey) return;
 
       const key = event.key.toLowerCase();
+      let action: (() => void) | null = null;
       if (event.key === "ArrowRight" || key === "d" || event.code === "KeyD") {
         event.preventDefault();
-        controlsRef.current?.like();
+        action = () => controlsRef.current?.like();
       } else if (event.key === "ArrowLeft" || key === "a" || event.code === "KeyA") {
         event.preventDefault();
-        controlsRef.current?.skip();
+        action = () => controlsRef.current?.skip();
       }
+      if (!action || event.repeat) return;
+
+      const now = Date.now();
+      if (now - lastKeyActionRef.current < KEYBOARD_COOLDOWN_MS) return;
+      lastKeyActionRef.current = now;
+      action();
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
