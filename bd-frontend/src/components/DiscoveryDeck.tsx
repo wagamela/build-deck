@@ -97,6 +97,8 @@ export default function DiscoveryDeck({
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (leaving) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest("a, button")) return;
     dragRef.current = {
       pointerId: event.pointerId,
       startX: event.clientX,
