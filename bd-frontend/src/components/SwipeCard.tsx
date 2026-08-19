@@ -1,20 +1,25 @@
-import { ArrowUpRight, GitFork, Star } from 'lucide-react'
-import type { Project } from '../data/projects'
+import { ArrowUpRight, GitFork, Star } from "lucide-react";
+import type { Project } from "../data/projects";
 
 function GitHubMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 16 16" fill="currentColor" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
     </svg>
-  )
+  );
 }
 
 function formatCount(count: number) {
   if (count >= 1000) {
-    const rounded = (count / 1000).toFixed(1).replace(/\.0$/, '')
-    return `${rounded}k`
+    const rounded = (count / 1000).toFixed(1).replace(/\.0$/, "");
+    return `${rounded}k`;
   }
-  return String(count)
+  return String(count);
 }
 
 function ProjectPreview({ project }: { project: Project }) {
@@ -32,8 +37,8 @@ function ProjectPreview({ project }: { project: Project }) {
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage:
-                'linear-gradient(to right, var(--color-line) 1px, transparent 1px), linear-gradient(to bottom, var(--color-line) 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
+                "linear-gradient(to right, var(--color-line) 1px, transparent 1px), linear-gradient(to bottom, var(--color-line) 1px, transparent 1px)",
+              backgroundSize: "24px 24px",
             }}
             aria-hidden="true"
           />
@@ -48,29 +53,36 @@ function ProjectPreview({ project }: { project: Project }) {
           <div
             className="absolute inset-x-0 bottom-0 flex h-1.5"
             role="img"
-            aria-label={`Language mix: ${project.languages.map((language) => `${language.name} ${language.share}%`).join(', ')}`}
+            aria-label={`Language mix: ${project.languages.map((language) => `${language.name} ${language.share}%`).join(", ")}`}
           >
             {project.languages.map((language) => (
               <span
                 key={language.name}
                 className="h-full"
-                style={{ width: `${language.share}%`, backgroundColor: language.color }}
+                style={{
+                  width: `${language.share}%`,
+                  backgroundColor: language.color,
+                }}
               />
             ))}
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
 
 interface SwipeCardProps {
-  project: Project
-  position: number
-  total: number
+  project: Project;
+  position: number;
+  total: number;
 }
 
-export default function SwipeCard({ project, position, total }: SwipeCardProps) {
+export default function SwipeCard({
+  project,
+  position,
+  total,
+}: SwipeCardProps) {
   return (
     <article className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-line bg-neutral">
       <div className="flex min-h-0 flex-1 flex-col px-6 pb-4 pt-5">
@@ -80,7 +92,8 @@ export default function SwipeCard({ project, position, total }: SwipeCardProps) 
             {project.category}
           </span>
           <span className="font-mono text-[0.7rem] text-muted/60">
-            {String(position).padStart(2, '0')} / {String(total).padStart(2, '0')}
+            {String(position).padStart(2, "0")} /{" "}
+            {String(total).padStart(2, "0")}
           </span>
         </div>
 
@@ -140,13 +153,16 @@ export default function SwipeCard({ project, position, total }: SwipeCardProps) 
           <div
             className="mt-3 flex h-1 w-full overflow-hidden rounded-full bg-surface"
             role="img"
-            aria-label={`Language mix: ${project.languages.map((language) => `${language.name} ${language.share}%`).join(', ')}`}
+            aria-label={`Language mix: ${project.languages.map((language) => `${language.name} ${language.share}%`).join(", ")}`}
           >
             {project.languages.map((language) => (
               <span
                 key={language.name}
                 className="h-full"
-                style={{ width: `${language.share}%`, backgroundColor: language.color }}
+                style={{
+                  width: `${language.share}%`,
+                  backgroundColor: language.color,
+                }}
               />
             ))}
           </div>
@@ -164,5 +180,5 @@ export default function SwipeCard({ project, position, total }: SwipeCardProps) 
         <ArrowUpRight className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
       </a>
     </article>
-  )
+  );
 }

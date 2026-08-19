@@ -1,5 +1,5 @@
 interface CardBackProps {
-  color: string
+  color: string;
 }
 
 export default function CardBack({ color }: CardBackProps) {
@@ -9,7 +9,13 @@ export default function CardBack({ color }: CardBackProps) {
       style={{ backgroundColor: color }}
     >
       <div className="flex h-16 w-16 items-center justify-center rounded-md border border-line bg-surface/60">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
           <rect
             x="6.2"
             y="3"
@@ -33,5 +39,5 @@ export default function CardBack({ color }: CardBackProps) {
         </svg>
       </div>
     </div>
-  )
+  );
 }

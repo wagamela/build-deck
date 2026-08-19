@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --color-primary: #5e6ad2;
@@ -15,8 +15,8 @@
   --color-warning: #f0c000;
   --color-error: #eb5757;
 
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --shadow-modal: 0 24px 48px rgb(0 0 0 / 0.4);
   --shadow-glow: 0 0 24px rgb(94 106 210 / 0.15);
