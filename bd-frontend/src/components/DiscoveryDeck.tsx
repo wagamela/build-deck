@@ -11,6 +11,7 @@ const SWIPE_THRESHOLD = 100;
 const TILT_PER_PX = 0.08;
 const MAX_TILT = 18;
 const FLYOUT_MS = 450;
+const REFILL_THRESHOLD = 4;
 const BACK_COLORS = ["#17171d", "#141419", "#191922", "#131318", "#16161c"];
 
 export interface DeckControls {
@@ -30,6 +31,7 @@ interface DiscoveryDeckProps {
   controlsRef: { current: DeckControls | null };
   onDecision?: (direction: "left" | "right") => void;
   onActiveChange?: (index: number) => void;
+  onRefill?: () => void;
 }
 
 export default function DiscoveryDeck({
@@ -37,6 +39,7 @@ export default function DiscoveryDeck({
   controlsRef,
   onDecision,
   onActiveChange,
+  onRefill,
 }: DiscoveryDeckProps) {
   const [counter, setCounter] = useState(0);
   const [dx, setDx] = useState(0);
@@ -48,6 +51,8 @@ export default function DiscoveryDeck({
   const draggedRef = useRef(false);
   const onDecisionRef = useRef(onDecision);
   const onActiveChangeRef = useRef(onActiveChange);
+  const onRefillRef = useRef(onRefill);
+  const refillInFlightRef = useRef(false);
 
   useEffect(() => {
     leavingRef.current = leaving;
@@ -61,14 +66,26 @@ export default function DiscoveryDeck({
     onActiveChangeRef.current = onActiveChange;
   }, [onActiveChange]);
 
+  useEffect(() => {
+    onRefillRef.current = onRefill;
+  }, [onRefill]);
+
   const total = deck.length;
-  const topIndex = counter % deck.length;
+  const topIndex = counter;
   const position = topIndex + 1;
-  const stack = [0, 1, 2].map((offset) => ({
-    project: deck[(topIndex + offset) % deck.length],
-    key: counter + offset,
-    offset,
-  }));
+  const stack = [0, 1, 2].flatMap((offset) => {
+    const project = deck[topIndex + offset];
+    return project ? [{ project, key: counter + offset, offset }] : [];
+  });
+
+  useEffect(() => {
+    if (deck.length - topIndex > REFILL_THRESHOLD) return;
+    if (refillInFlightRef.current) return;
+    refillInFlightRef.current = true;
+    Promise.resolve(onRefillRef.current?.()).finally(() => {
+      refillInFlightRef.current = false;
+    });
+  }, [topIndex, deck.length]);
 
   const tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, dx * TILT_PER_PX));
   const likeProgress = Math.min(Math.max(dx / SWIPE_THRESHOLD, 0), 1);

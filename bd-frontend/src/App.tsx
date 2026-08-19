@@ -524,17 +524,21 @@ function LoadingState() {
 }
 
 function App() {
-  const { projects, usingFallback } = useProjects();
-  if (projects === null) return <LoadingState />;
-  return <Deck projects={projects} usingFallback={usingFallback} />;
+  const { projects, usingFallback, loadMore } = useProjects();
+  if (projects.length === 0) return <LoadingState />;
+  return (
+    <Deck projects={projects} usingFallback={usingFallback} onRefill={loadMore} />
+  );
 }
 
 function Deck({
   projects,
   usingFallback,
+  onRefill,
 }: {
   projects: Project[];
   usingFallback: boolean;
+  onRefill: () => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -702,6 +706,7 @@ function Deck({
             controlsRef={controlsRef}
             onDecision={handleDecision}
             onActiveChange={handleActiveChange}
+            onRefill={onRefill}
           />
           <ActionBar
             onLike={() => controlsRef.current?.like()}

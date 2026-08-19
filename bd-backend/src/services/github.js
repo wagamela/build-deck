@@ -1,7 +1,7 @@
 const GITHUB_API = 'https://api.github.com'
 const DEFAULT_COUNT = 12
 const FETCH_BUFFER = 18
-const CACHE_TTL_MS = 30 * 60 * 1000
+const MAX_SCAN = 90
 const SELF_REPO = 'wagamela/build-deck'
 
 const LANGUAGE_COLORS = {
@@ -128,38 +128,71 @@ async function fetchLanguages(fullName) {
   return toLanguageShares(languages)
 }
 
-let cache = null
-let cacheAt = 0
+let seenRepos = new Set()
+let cursorPage = 1
+
+function repoKey(repo) {
+  return repo.full_name.toLowerCase()
+}
+
+function excluded(repo) {
+  return (
+    repo.fork ||
+    repo.archived ||
+    repo.full_name.toLowerCase() === SELF_REPO ||
+    !repo.description ||
+    !repo.language
+  )
+}
 
 export async function getProjects({ refresh = false, query, sort, perPage } = {}) {
-  const now = Date.now()
-  if (!refresh && cache && now - cacheAt < CACHE_TTL_MS) return cache
-
-  const target = Math.min(perPage || DEFAULT_COUNT, 30)
-  const params = new URLSearchParams({
-    q: query || defaultQuery(),
-    sort: sort || 'stars',
-    order: 'desc',
-    per_page: String(Math.max(target, FETCH_BUFFER)),
-  })
-
-  const data = await githubFetch(`/search/repositories?${params}`)
-
-  const repos = (data.items || [])
-    .filter((repo) => !repo.fork && !repo.archived)
-    .filter((repo) => repo.full_name.toLowerCase() !== SELF_REPO)
-    .filter((repo) => repo.description)
-    .filter((repo) => repo.language)
-
-  const projects = []
-  for (const repo of repos) {
-    if (projects.length >= target) break
-    const project = mapRepo(repo)
-    project.languages = await fetchLanguages(repo.full_name)
-    if (project.languages.length > 0) projects.push(project)
+  if (refresh) {
+    seenRepos = new Set()
+    cursorPage = 1
   }
 
-  cache = projects
-  cacheAt = now
+  const target = Math.min(perPage || DEFAULT_COUNT, 30)
+  const projects = []
+  let page = cursorPage
+  let scanned = 0
+
+  while (projects.length < target && scanned < MAX_SCAN) {
+    const params = new URLSearchParams({
+      q: query || defaultQuery(),
+      sort: sort || 'stars',
+      order: 'desc',
+      per_page: String(FETCH_BUFFER),
+      page: String(page),
+    })
+
+    const data = await githubFetch(`/search/repositories?${params}`)
+    const items = data.items || []
+    scanned += items.length
+    if (items.length === 0) break
+
+    for (const repo of items) {
+      if (projects.length >= target) break
+      if (excluded(repo) || seenRepos.has(repoKey(repo))) continue
+
+      const project = mapRepo(repo)
+      project.languages = await fetchLanguages(repo.full_name)
+      if (project.languages.length === 0) continue
+
+      projects.push(project)
+      seenRepos.add(repoKey(repo))
+    }
+
+    page += 1
+  }
+
+  cursorPage = page
+
+  // Scanned a wide range but couldn't fill the batch, meaning every result
+  // in range has already been shown — let the next request start over.
+  if (projects.length < target && scanned > 0) {
+    seenRepos = new Set()
+    cursorPage = 1
+  }
+
   return projects
 }
