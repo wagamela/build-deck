@@ -112,6 +112,23 @@ function XMark({ className }: { className?: string }) {
   );
 }
 
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="m4 4 8 8" />
+      <path d="m12 4-8 8" />
+    </svg>
+  );
+}
+
 function LinkedInMark({ className }: { className?: string }) {
   return (
     <svg
@@ -204,7 +221,7 @@ function IntroOverlay({ onDismiss }: IntroOverlayProps) {
             aria-label="Close instructions"
             className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
           >
-            <XMark className="h-3.5 w-3.5" />
+            <CloseIcon className="h-3.5 w-3.5" />
           </button>
         </div>
 
@@ -329,7 +346,7 @@ function DebugPanel({
           aria-label="Close debug mode"
           className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
         >
-          <XMark className="h-3.5 w-3.5" />
+          <CloseIcon className="h-3.5 w-3.5" />
         </button>
       </div>
 
