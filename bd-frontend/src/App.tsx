@@ -227,15 +227,15 @@ function IntroOverlay({ onDismiss }: IntroOverlayProps) {
 
         <h2 className="mt-3 font-display text-xl text-text">Swipe to discover</h2>
         <p className="mt-2 text-[13px] leading-relaxed text-muted">
-          Flip through real projects like a deck of cards. Swipe to decide, or use
-          the keys.
+          Flip through real projects like a deck of cards. Swipe to decide, or
+          use A / D or the arrow keys.
         </p>
 
         <ol className="mt-4 space-y-2">
           <Step
             icon={<SwipeIcon className="h-3.5 w-3.5" />}
             label="Swipe the card"
-            hint="← pass · → like"
+            hint="A / ← pass · D / → like"
           />
           <Step
             icon={<ArrowIcon direction="left" className="h-3.5 w-3.5" />}
@@ -581,10 +581,10 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
         </span>
         <span className="h-3 w-px bg-line" aria-hidden="true" />
         <span className="flex items-center gap-1.5">
-          <Kbd>←</Kbd> pass
+          <Kbd>A / ←</Kbd> pass
         </span>
         <span className="flex items-center gap-1.5">
-          <Kbd>→</Kbd> like
+          <Kbd>D / →</Kbd> like
         </span>
       </div>
     </div>
@@ -661,10 +661,18 @@ function App() {
         setDebugOpen((open) => !open);
         return;
       }
-      if (event.key === "ArrowRight") {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+      if (isTyping || event.ctrlKey || event.metaKey || event.altKey) return;
+
+      const key = event.key.toLowerCase();
+      if (event.key === "ArrowRight" || key === "d" || event.code === "KeyD") {
         event.preventDefault();
         controlsRef.current?.like();
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.key === "ArrowLeft" || key === "a" || event.code === "KeyA") {
         event.preventDefault();
         controlsRef.current?.skip();
       }
