@@ -7,6 +7,7 @@ export interface LanguageShare {
 export interface Project {
   name: string
   owner: string
+  ownerAvatarUrl?: string
   description: string
   category: string
   stars: number
@@ -20,6 +21,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Nimbus',
     owner: 'mika-codes',
+    ownerAvatarUrl: 'https://github.com/mika-codes.png?size=96',
     description:
       'Review and approve pull requests from your terminal before they ever merge.',
     category: 'Developer Tools',
@@ -35,6 +37,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Fermata',
     owner: 'elliotruns',
+    ownerAvatarUrl: 'https://github.com/elliotruns.png?size=96',
     description:
       'A dead-simple music player that plays local files and looks beautiful doing it.',
     category: 'Productivity',
@@ -50,6 +53,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Herbivore',
     owner: 'shelbymai',
+    ownerAvatarUrl: 'https://github.com/shelbymai.png?size=96',
     description:
       'Turn whatever is already in your pantry into a shopping list and a week of meals.',
     category: 'Lifestyle',
@@ -65,6 +69,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Kilo',
     owner: 'daniroder',
+    ownerAvatarUrl: 'https://github.com/daniroder.png?size=96',
     description:
       'A habit tracker that puts real money on the line and donates your misses to charity.',
     category: 'Health & Fitness',
@@ -80,6 +85,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Cove',
     owner: 'nadiapark',
+    ownerAvatarUrl: 'https://github.com/nadiapark.png?size=96',
     description:
       'A real-time whiteboard that keeps remote teams in sync without the meeting.',
     category: 'Collaboration',
@@ -95,6 +101,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Moonpath',
     owner: 'kylefitz',
+    ownerAvatarUrl: 'https://github.com/kylefitz.png?size=96',
     description:
       'Night-friendly public transit navigation that tells you when the next bus actually comes.',
     category: 'Mobility',
@@ -110,6 +117,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Sprout',
     owner: 'monicareyes',
+    ownerAvatarUrl: 'https://github.com/monicareyes.png?size=96',
     description:
       'Plan your garden, track planting windows, and get watering reminders that make sense.',
     category: 'Home & Garden',
@@ -125,6 +133,7 @@ export const fallbackProjects: Project[] = [
   {
     name: 'Echo',
     owner: 'tzunamii',
+    ownerAvatarUrl: 'https://github.com/tzunamii.png?size=96',
     description:
       'Record voice notes that transcribe themselves and sort into topics automatically.',
     category: 'Productivity',

@@ -110,6 +110,7 @@ function mapRepo(repo) {
   return {
     name: repo.name,
     owner: repo.owner.login,
+    ownerAvatarUrl: repo.owner.avatar_url,
     description: (repo.description || '').trim(),
     category: topicToCategory(repo.topics),
     stars: repo.stargazers_count,

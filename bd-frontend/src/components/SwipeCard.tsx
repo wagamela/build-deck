@@ -98,7 +98,17 @@ export default function SwipeCard({
         </div>
 
         <div className="mt-5">
-          <p className="text-xs font-medium text-muted">by {project.owner}</p>
+          <p className="flex items-center gap-2 text-xs font-medium text-muted">
+            {project.ownerAvatarUrl && (
+              <img
+                src={project.ownerAvatarUrl}
+                alt={`${project.owner} profile photo`}
+                loading="lazy"
+                className="h-5 w-5 rounded-full border border-line bg-surface"
+              />
+            )}
+            <span>by {project.owner}</span>
+          </p>
           <h2 className="mt-1 font-display text-[1.75rem] leading-tight text-text">
             {project.name}
           </h2>
