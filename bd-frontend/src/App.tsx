@@ -7,7 +7,8 @@ import {
   X,
 } from "lucide-react";
 import DiscoveryDeck, { type DeckControls } from "./components/DiscoveryDeck";
-import { projects } from "./data/projects";
+import { useProjects } from "./hooks/useProjects";
+import type { Project } from "./data/projects";
 
 const BUILDDECK_REPO = "https://github.com/wagamela/build-deck";
 const KEYBOARD_COOLDOWN_MS = 500;
@@ -208,6 +209,7 @@ function DebugButton({
 }
 
 interface DebugPanelProps {
+  project: Project;
   activeIndex: number;
   total: number;
   history: HistoryEntry[];
@@ -221,6 +223,7 @@ interface DebugPanelProps {
 }
 
 function DebugPanel({
+  project,
   activeIndex,
   total,
   history,
@@ -233,7 +236,6 @@ function DebugPanel({
   onClose,
 }: DebugPanelProps) {
   const [copied, setCopied] = useState(false);
-  const project = projects[activeIndex];
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -512,7 +514,28 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
   );
 }
 
+function LoadingState() {
+  return (
+    <main className="app-bg flex h-dvh flex-col items-center justify-center gap-5 text-text">
+      <DeckMark className="h-11 w-11 animate-pulse" />
+      <p className="font-mono text-xs text-muted">dealing the deck…</p>
+    </main>
+  );
+}
+
 function App() {
+  const { projects, usingFallback } = useProjects();
+  if (projects === null) return <LoadingState />;
+  return <Deck projects={projects} usingFallback={usingFallback} />;
+}
+
+function Deck({
+  projects,
+  usingFallback,
+}: {
+  projects: Project[];
+  usingFallback: boolean;
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [showIntro, setShowIntro] = useState(
@@ -546,7 +569,7 @@ function App() {
         },
       ]);
     },
-    [activeIndex],
+    [activeIndex, projects],
   );
 
   const handleRevisit = useCallback((index: number) => {
@@ -618,9 +641,22 @@ function App() {
         outlines ? "debug-outlines" : ""
       }`}
     >
+      {usingFallback && (
+        <div className="fixed left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 shadow-modal">
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ backgroundColor: "#f0c000" }}
+            aria-hidden="true"
+          />
+          <p className="whitespace-nowrap text-xs text-muted">
+            API unreachable — showing sample projects
+          </p>
+        </div>
+      )}
       {showIntro && <IntroOverlay onDismiss={dismissIntro} />}
       {debugOpen && (
         <DebugPanel
+          project={projects[activeIndex]}
           activeIndex={activeIndex}
           total={total}
           history={history}

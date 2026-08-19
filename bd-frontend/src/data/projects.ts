@@ -16,7 +16,7 @@ export interface Project {
   image?: string
 }
 
-export const projects: Project[] = [
+export const fallbackProjects: Project[] = [
   {
     name: 'Nimbus',
     owner: 'mika-codes',
