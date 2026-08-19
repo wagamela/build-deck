@@ -1,4 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  ArrowUpRight,
+  X,
+} from "lucide-react";
 import DiscoveryDeck, { type DeckControls } from "./components/DiscoveryDeck";
 import { projects } from "./data/projects";
 
@@ -36,57 +43,6 @@ function DeckMark({ className }: { className?: string }) {
   );
 }
 
-function ArrowIcon({
-  direction,
-  className,
-}: {
-  direction: "left" | "right";
-  className?: string;
-}) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      {direction === "left" ? (
-        <>
-          <path d="M13 8H3" />
-          <path d="m7 4-4 4 4 4" />
-        </>
-      ) : (
-        <>
-          <path d="M3 8h10" />
-          <path d="m9 4 4 4-4 4" />
-        </>
-      )}
-    </svg>
-  );
-}
-
-function ArrowUpRight({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M4 12 12 4" />
-      <path d="M6 4h6v6" />
-    </svg>
-  );
-}
-
 function GitHubMark({ className }: { className?: string }) {
   return (
     <svg
@@ -113,23 +69,6 @@ function XMark({ className }: { className?: string }) {
   );
 }
 
-function CloseIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="m4 4 8 8" />
-      <path d="m12 4-8 8" />
-    </svg>
-  );
-}
-
 function LinkedInMark({ className }: { className?: string }) {
   return (
     <svg
@@ -139,25 +78,6 @@ function LinkedInMark({ className }: { className?: string }) {
       aria-hidden="true"
     >
       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v4.286ZM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124ZM7.119 20.452H3.555V9h3.564v11.452Z" />
-    </svg>
-  );
-}
-
-function SwipeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M5.5 11.5 2 8l3.5-3.5" />
-      <path d="M10.5 11.5 14 8l-3.5-3.5" />
-      <path d="M2 8h12" />
     </svg>
   );
 }
@@ -222,7 +142,7 @@ function IntroOverlay({ onDismiss }: IntroOverlayProps) {
             aria-label="Close instructions"
             className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
           >
-            <CloseIcon className="h-3.5 w-3.5" />
+<X className="h-3.5 w-3.5" />
           </button>
         </div>
 
@@ -234,12 +154,12 @@ function IntroOverlay({ onDismiss }: IntroOverlayProps) {
 
         <ol className="mt-4 space-y-2">
           <Step
-            icon={<SwipeIcon className="h-3.5 w-3.5" />}
+            icon={<ArrowLeftRight className="h-3.5 w-3.5" />}
             label="Swipe the card"
             hint="A / ← pass · D / → like"
           />
           <Step
-            icon={<ArrowIcon direction="left" className="h-3.5 w-3.5" />}
+            icon={<ArrowLeft className="h-3.5 w-3.5" />}
             label="Revisit from sidebar"
             hint="past cards"
           />
@@ -347,7 +267,7 @@ function DebugPanel({
           aria-label="Close debug mode"
           className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
         >
-          <CloseIcon className="h-3.5 w-3.5" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
 
@@ -563,7 +483,7 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
           onClick={onPass}
           className="flex h-9 items-center gap-2 rounded-md border border-line bg-transparent px-4 text-[13px] font-medium text-text transition-colors duration-100 hover:border-muted hover:bg-surface focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-[0.97]"
         >
-          <ArrowIcon direction="left" className="h-4 w-4 text-muted" />
+          <ArrowLeft className="h-4 w-4 text-muted" />
           Pass
         </button>
         <button
@@ -572,12 +492,12 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
           className="flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-[13px] font-medium text-white transition-colors duration-100 hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary active:scale-[0.97]"
         >
           Like
-          <ArrowIcon direction="right" className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4" />
         </button>
       </div>
       <div className="flex h-8 items-center gap-3 rounded-full border border-line bg-surface px-4 text-xs text-muted">
         <span className="flex items-center gap-1.5 font-medium">
-          <SwipeIcon className="h-4 w-4" />
+          <ArrowLeftRight className="h-4 w-4" />
           swipe the card
         </span>
         <span className="h-3 w-px bg-line" aria-hidden="true" />
