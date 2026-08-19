@@ -115,17 +115,23 @@ function mapRepo(repo) {
     category: topicToCategory(repo.topics),
     stars: repo.stargazers_count,
     forks: repo.forks_count,
+    watchers: repo.subscribers_count,
     languages: [],
     url: repo.html_url,
   }
 }
 
-async function fetchLanguages(fullName) {
+async function fetchRepoDetails(fullName) {
   const [owner, repo] = fullName.split('/')
-  const languages = await githubFetch(
-    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/languages`,
-  ).catch(() => ({}))
-  return toLanguageShares(languages)
+  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
+  const [details, languages] = await Promise.all([
+    githubFetch(path).catch(() => null),
+    githubFetch(`${path}/languages`).catch(() => ({})),
+  ])
+  return {
+    languages: toLanguageShares(languages),
+    subscribers: details?.subscribers_count ?? 0,
+  }
 }
 
 let seenRepos = new Set()
@@ -175,7 +181,9 @@ export async function getProjects({ refresh = false, query, sort, perPage } = {}
       if (excluded(repo) || seenRepos.has(repoKey(repo))) continue
 
       const project = mapRepo(repo)
-      project.languages = await fetchLanguages(repo.full_name)
+      const details = await fetchRepoDetails(repo.full_name)
+      project.languages = details.languages
+      project.watchers = details.subscribers
       if (project.languages.length === 0) continue
 
       projects.push(project)

@@ -1,4 +1,4 @@
-import { ArrowUpRight, GitFork, Star } from "lucide-react";
+import { ArrowUpRight, Eye, GitFork, Star } from "lucide-react";
 import type { Project } from "../data/projects";
 
 function GitHubMark({ className }: { className?: string }) {
@@ -136,6 +136,16 @@ export default function SwipeCard({
             </p>
             <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
               Forks
+            </p>
+          </div>
+          <span className="h-6 w-px bg-line" aria-hidden="true" />
+          <div>
+            <p className="flex items-center gap-1.5 text-lg font-semibold text-text">
+              <Eye className="h-4 w-4 text-muted" />
+              {formatCount(project.watchers)}
+            </p>
+            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
+              Watchers
             </p>
           </div>
         </div>

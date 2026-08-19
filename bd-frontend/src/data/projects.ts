@@ -12,6 +12,7 @@ export interface Project {
   category: string
   stars: number
   forks: number
+  watchers: number
   languages: LanguageShare[]
   url: string
   image?: string
@@ -27,6 +28,7 @@ export const fallbackProjects: Project[] = [
     category: 'Developer Tools',
     stars: 12800,
     forks: 984,
+    watchers: 210,
     languages: [
       { name: 'TypeScript', color: '#3178c6', share: 58 },
       { name: 'JavaScript', color: '#f1e05a', share: 26 },
@@ -43,6 +45,7 @@ export const fallbackProjects: Project[] = [
     category: 'Productivity',
     stars: 6412,
     forks: 512,
+    watchers: 95,
     languages: [
       { name: 'Rust', color: '#dea584', share: 82 },
       { name: 'TypeScript', color: '#3178c6', share: 14 },
@@ -59,6 +62,7 @@ export const fallbackProjects: Project[] = [
     category: 'Lifestyle',
     stars: 8900,
     forks: 743,
+    watchers: 160,
     languages: [
       { name: 'Python', color: '#3572a5', share: 76 },
       { name: 'JavaScript', color: '#f1e05a', share: 19 },
@@ -75,6 +79,7 @@ export const fallbackProjects: Project[] = [
     category: 'Health & Fitness',
     stars: 21400,
     forks: 1902,
+    watchers: 340,
     languages: [
       { name: 'TypeScript', color: '#3178c6', share: 64 },
       { name: 'Swift', color: '#f05138', share: 21 },
@@ -91,6 +96,7 @@ export const fallbackProjects: Project[] = [
     category: 'Collaboration',
     stars: 15800,
     forks: 1331,
+    watchers: 260,
     languages: [
       { name: 'TypeScript', color: '#3178c6', share: 71 },
       { name: 'CSS', color: '#563d7c', share: 17 },
@@ -107,6 +113,7 @@ export const fallbackProjects: Project[] = [
     category: 'Mobility',
     stars: 4700,
     forks: 388,
+    watchers: 70,
     languages: [
       { name: 'Dart', color: '#00b4ab', share: 52 },
       { name: 'Go', color: '#00add8', share: 33 },
@@ -123,6 +130,7 @@ export const fallbackProjects: Project[] = [
     category: 'Home & Garden',
     stars: 7300,
     forks: 590,
+    watchers: 120,
     languages: [
       { name: 'Vue', color: '#41b883', share: 44 },
       { name: 'JavaScript', color: '#f1e05a', share: 31 },
@@ -139,6 +147,7 @@ export const fallbackProjects: Project[] = [
     category: 'Productivity',
     stars: 9900,
     forks: 821,
+    watchers: 175,
     languages: [
       { name: 'Swift', color: '#f05138', share: 68 },
       { name: 'Python', color: '#3572a5', share: 22 },
