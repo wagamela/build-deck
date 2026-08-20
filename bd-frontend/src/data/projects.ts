@@ -4,6 +4,11 @@ export interface LanguageShare {
   share: number
 }
 
+export interface Contributor {
+  login: string
+  avatarUrl: string
+}
+
 export interface Project {
   name: string
   owner: string
@@ -14,6 +19,8 @@ export interface Project {
   forks: number
   watchers: number
   languages: LanguageShare[]
+  contributors: Contributor[]
+  contributorsCount: number
   url: string
   image?: string
 }
@@ -29,6 +36,12 @@ export const fallbackProjects: Project[] = [
     stars: 12800,
     forks: 984,
     watchers: 210,
+    contributors: [
+      { login: 'mika-codes', avatarUrl: 'https://github.com/mika-codes.png?size=96' },
+      { login: 'rajdev-99', avatarUrl: 'https://github.com/rajdev-99.png?size=96' },
+      { login: 'lenabuilds', avatarUrl: 'https://github.com/lenabuilds.png?size=96' },
+    ],
+    contributorsCount: 34,
     languages: [
       { name: 'TypeScript', color: '#3178c6', share: 58 },
       { name: 'JavaScript', color: '#f1e05a', share: 26 },
@@ -46,6 +59,12 @@ export const fallbackProjects: Project[] = [
     stars: 6412,
     forks: 512,
     watchers: 95,
+    contributors: [
+      { login: 'elliotruns', avatarUrl: 'https://github.com/elliotruns.png?size=96' },
+      { login: 'samoshka', avatarUrl: 'https://github.com/samoshka.png?size=96' },
+      { login: 'yuki-koder', avatarUrl: 'https://github.com/yuki-koder.png?size=96' },
+    ],
+    contributorsCount: 19,
     languages: [
       { name: 'Rust', color: '#dea584', share: 82 },
       { name: 'TypeScript', color: '#3178c6', share: 14 },
@@ -63,6 +82,12 @@ export const fallbackProjects: Project[] = [
     stars: 8900,
     forks: 743,
     watchers: 160,
+    contributors: [
+      { login: 'shelbymai', avatarUrl: 'https://github.com/shelbymai.png?size=96' },
+      { login: 'togunz', avatarUrl: 'https://github.com/togunz.png?size=96' },
+      { login: 'vihaanpatel', avatarUrl: 'https://github.com/vihaanpatel.png?size=96' },
+    ],
+    contributorsCount: 27,
     languages: [
       { name: 'Python', color: '#3572a5', share: 76 },
       { name: 'JavaScript', color: '#f1e05a', share: 19 },
@@ -80,6 +105,12 @@ export const fallbackProjects: Project[] = [
     stars: 21400,
     forks: 1902,
     watchers: 340,
+    contributors: [
+      { login: 'daniroder', avatarUrl: 'https://github.com/daniroder.png?size=96' },
+      { login: 'kenn_os', avatarUrl: 'https://github.com/kenn_os.png?size=96' },
+      { login: 'priyacodes', avatarUrl: 'https://github.com/priyacodes.png?size=96' },
+    ],
+    contributorsCount: 41,
     languages: [
       { name: 'TypeScript', color: '#3178c6', share: 64 },
       { name: 'Swift', color: '#f05138', share: 21 },
@@ -97,6 +128,12 @@ export const fallbackProjects: Project[] = [
     stars: 15800,
     forks: 1331,
     watchers: 260,
+    contributors: [
+      { login: 'nadiapark', avatarUrl: 'https://github.com/nadiapark.png?size=96' },
+      { login: 'gitron', avatarUrl: 'https://github.com/gitron.png?size=96' },
+      { login: 'miranda-q', avatarUrl: 'https://github.com/miranda-q.png?size=96' },
+    ],
+    contributorsCount: 23,
     languages: [
       { name: 'TypeScript', color: '#3178c6', share: 71 },
       { name: 'CSS', color: '#563d7c', share: 17 },
@@ -114,6 +151,12 @@ export const fallbackProjects: Project[] = [
     stars: 4700,
     forks: 388,
     watchers: 70,
+    contributors: [
+      { login: 'kylefitz', avatarUrl: 'https://github.com/kylefitz.png?size=96' },
+      { login: 'beto_dev', avatarUrl: 'https://github.com/beto_dev.png?size=96' },
+      { login: 'hannalee', avatarUrl: 'https://github.com/hannalee.png?size=96' },
+    ],
+    contributorsCount: 15,
     languages: [
       { name: 'Dart', color: '#00b4ab', share: 52 },
       { name: 'Go', color: '#00add8', share: 33 },
@@ -131,6 +174,12 @@ export const fallbackProjects: Project[] = [
     stars: 7300,
     forks: 590,
     watchers: 120,
+    contributors: [
+      { login: 'monicareyes', avatarUrl: 'https://github.com/monicareyes.png?size=96' },
+      { login: 'faruk-7', avatarUrl: 'https://github.com/faruk-7.png?size=96' },
+      { login: 'juliahsu', avatarUrl: 'https://github.com/juliahsu.png?size=96' },
+    ],
+    contributorsCount: 18,
     languages: [
       { name: 'Vue', color: '#41b883', share: 44 },
       { name: 'JavaScript', color: '#f1e05a', share: 31 },
@@ -148,6 +197,12 @@ export const fallbackProjects: Project[] = [
     stars: 9900,
     forks: 821,
     watchers: 175,
+    contributors: [
+      { login: 'tzunamii', avatarUrl: 'https://github.com/tzunamii.png?size=96' },
+      { login: 'marcus-s', avatarUrl: 'https://github.com/marcus-s.png?size=96' },
+      { login: 'anikagupta', avatarUrl: 'https://github.com/anikagupta.png?size=96' },
+    ],
+    contributorsCount: 12,
     languages: [
       { name: 'Swift', color: '#f05138', share: 68 },
       { name: 'Python', color: '#3572a5', share: 22 },

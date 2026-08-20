@@ -57,7 +57,7 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-async function githubFetch(path) {
+async function githubFetch(path, { raw = false } = {}) {
   const response = await fetch(`${GITHUB_API}${path}`, {
     headers: {
       Accept: 'application/vnd.github+json',
@@ -72,7 +72,14 @@ async function githubFetch(path) {
     throw new Error(`GitHub API ${response.status}: ${message || response.statusText}`)
   }
 
+  if (raw) return response
   return response.json()
+}
+
+function lastPageFromLink(linkHeader) {
+  if (!linkHeader) return null
+  const match = linkHeader.match(/page=(\d+)>;\s*rel="last"/)
+  return match ? Number(match[1]) : null
 }
 
 function topicToCategory(topics = []) {
@@ -117,20 +124,49 @@ function mapRepo(repo) {
     forks: repo.forks_count,
     watchers: repo.subscribers_count,
     languages: [],
+    contributors: [],
+    contributorsCount: 0,
     url: repo.html_url,
   }
+}
+
+async function fetchContributors(path) {
+  const [topContributors, countResponse] = await Promise.all([
+    githubFetch(`${path}/contributors?per_page=3`).catch(() => []),
+    githubFetch(`${path}/contributors?per_page=1`, { raw: true }).catch(() => null),
+  ])
+
+  const contributors = Array.isArray(topContributors)
+    ? topContributors
+        .filter((contributor) => contributor.login && contributor.avatar_url)
+        .map((contributor) => ({
+          login: contributor.login,
+          avatarUrl: contributor.avatar_url,
+        }))
+    : []
+
+  let contributorsCount = contributors.length
+  const lastPage = countResponse
+    ? lastPageFromLink(countResponse.headers.get('link'))
+    : null
+  if (lastPage) contributorsCount = lastPage
+
+  return { contributors, contributorsCount }
 }
 
 async function fetchRepoDetails(fullName) {
   const [owner, repo] = fullName.split('/')
   const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
-  const [details, languages] = await Promise.all([
+  const [details, languages, contributors] = await Promise.all([
     githubFetch(path).catch(() => null),
     githubFetch(`${path}/languages`).catch(() => ({})),
+    fetchContributors(path),
   ])
   return {
     languages: toLanguageShares(languages),
     subscribers: details?.subscribers_count ?? 0,
+    contributors: contributors.contributors,
+    contributorsCount: contributors.contributorsCount,
   }
 }
 
@@ -184,6 +220,8 @@ export async function getProjects({ refresh = false, query, sort, perPage } = {}
       const details = await fetchRepoDetails(repo.full_name)
       project.languages = details.languages
       project.watchers = details.subscribers
+      project.contributors = details.contributors
+      project.contributorsCount = details.contributorsCount
       if (project.languages.length === 0) continue
 
       projects.push(project)

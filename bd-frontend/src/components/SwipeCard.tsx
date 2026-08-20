@@ -83,6 +83,10 @@ export default function SwipeCard({
   position,
   total,
 }: SwipeCardProps) {
+  const contributors = project.contributors?.slice(0, 3) ?? [];
+  const contributorsCount = project.contributorsCount ?? 0;
+  const extraContributors = Math.max(0, contributorsCount - contributors.length);
+  const showContributors = contributors.length > 0 || contributorsCount > 0;
   return (
     <article className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-line bg-neutral">
       <div className="flex min-h-0 flex-1 flex-col px-6 pb-4 pt-5">
@@ -114,7 +118,7 @@ export default function SwipeCard({
           </h2>
         </div>
 
-        <div className="mt-4 flex min-h-24 flex-1 flex-col overflow-hidden rounded-md border border-line bg-surface">
+        <div className="mt-4 flex h-40 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface">
           <ProjectPreview project={project} />
         </div>
 
@@ -149,6 +153,34 @@ export default function SwipeCard({
             </p>
           </div>
         </div>
+
+        {showContributors && (
+          <div className="mt-4 flex items-center gap-2.5">
+            <div className="flex items-center">
+              {contributors.map((contributor, index) => (
+                <img
+                  key={contributor.login}
+                  src={contributor.avatarUrl}
+                  alt={`${contributor.login} profile photo`}
+                  loading="lazy"
+                  className="h-6 w-6 rounded-full border-2 border-neutral bg-surface object-cover"
+                  style={{ marginLeft: index === 0 ? 0 : -7 }}
+                />
+              ))}
+              {extraContributors > 0 && (
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-neutral bg-surface font-mono text-[0.6rem] font-semibold text-muted"
+                  style={{ marginLeft: -7 }}
+                >
+                  +{extraContributors}
+                </span>
+              )}
+            </div>
+            <span className="text-xs font-medium text-muted">
+              {formatCount(contributorsCount)} contributors
+            </span>
+          </div>
+        )}
 
         <p className="mt-4 line-clamp-3 text-[13px] leading-relaxed text-muted">
           {project.description}
