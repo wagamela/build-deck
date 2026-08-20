@@ -29,7 +29,7 @@ function ProjectPreview({ project }: { project: Project }) {
         <img
           src={project.image}
           alt={`${project.name} screenshot`}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full bg-surface object-contain object-center"
         />
       ) : (
         <div className="absolute inset-0 overflow-hidden bg-surface">

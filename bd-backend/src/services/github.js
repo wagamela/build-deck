@@ -57,10 +57,10 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-async function githubFetch(path, { raw = false } = {}) {
+async function githubFetch(path, { raw = false, accept = 'application/vnd.github+json' } = {}) {
   const response = await fetch(`${GITHUB_API}${path}`, {
     headers: {
-      Accept: 'application/vnd.github+json',
+      Accept: accept,
       'User-Agent': 'BuildDeck',
       ...authHeaders(),
     },
@@ -80,6 +80,124 @@ function lastPageFromLink(linkHeader) {
   if (!linkHeader) return null
   const match = linkHeader.match(/page=(\d+)>;\s*rel="last"/)
   return match ? Number(match[1]) : null
+}
+
+function extractImageUrls(readme) {
+  const urls = []
+  const markdownPattern = /!\[[^\]]*\]\(([^)\s]+)(?:\s+["'([][^)]*)?\)/g
+  let match
+  while ((match = markdownPattern.exec(readme)) !== null) urls.push(match[1])
+
+  const htmlPattern = /<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi
+  while ((match = htmlPattern.exec(readme)) !== null) urls.push(match[1])
+
+  return urls
+}
+
+function resolveImageUrl(src, fullName) {
+  if (!src) return null
+  let url = src.trim().replace(/^<(.*)>$/, '$1').trim()
+  if (!url || /^data:/i.test(url)) return null
+  if (/^https?:\/\//i.test(url)) return url
+
+  const clean = url.replace(/^\.?\/+/, '')
+  if (!clean) return null
+  return `https://raw.githubusercontent.com/${fullName}/HEAD/${clean}`
+}
+
+const BADGE_HOSTS = [
+  'img.shields.io',
+  'shields.io',
+  'badgen.net',
+  'flat.badgen.net',
+  'badge.fury.io',
+  'forthebadge.com',
+  'travis-ci.org',
+  'travis-ci.com',
+  'app.travis-ci.com',
+  'circleci.com',
+  'circle.ci',
+  'codecov.io',
+  'coveralls.io',
+  'app.codacy.com',
+  'api.codacy.com',
+  'api.dependabot.com',
+  'hits.seeyoufarm.com',
+  'img.badgesize.io',
+  'bettercodehub.com',
+  'api.codeclimate.com',
+  'api.goreportcard.com',
+  'goreportcard.com',
+  'david-dm.org',
+  'dev.azure.com',
+  'app.netlify.com',
+  'api.netlify.com',
+  'opencollective.com',
+  'liberapay.com',
+  'www.patreon.com',
+  'snyk.io',
+  'githbadges.com',
+  'php-eye.com',
+  'scrutinizer-ci.com',
+  'codefactor.io',
+  'www.codefactor.io',
+  'lgtm.com',
+  'deepscan.io',
+  'maven-badges.herokuapp.com',
+  'badges.gitter.im',
+  'img.gitter.im',
+  'badge.waffle.io',
+  'api.greenkeeper.io',
+  'api.bitrise.io',
+  'ci.appveyor.com',
+  'app.fossa.com',
+  'api.fossa.com',
+  'badges-cdn.swaggerhub.com',
+  'repostatus.org',
+  'www.repostatus.org',
+  'api.repostatus.org',
+]
+
+const BADGE_URL_PATTERNS = [
+  /\/actions\/workflows\/[^/]+\/badge\.svg$/i,
+  /\/workflows\/[^/]+\/badge\.svg$/i,
+  /\/badge\/[^/]+\.(svg|png|gif)$/i,
+  /\/badges\//i,
+  /\/shields\//i,
+  /[?&]badge=/i,
+]
+
+function isBadgeUrl(url) {
+  const host = (url.match(/^https?:\/\/([^/?#]+)/i) || [])[1]
+  if (host) {
+    const normalized = host.toLowerCase()
+    if (BADGE_HOSTS.some((badge) => normalized === badge || normalized.endsWith(`.${badge}`))) {
+      return true
+    }
+  }
+  return BADGE_URL_PATTERNS.some((pattern) => pattern.test(url))
+}
+
+function isSvgImage(url) {
+  return /\.svg(\?|#|$)/i.test(url)
+}
+
+async function fetchReadmeImage(fullName) {
+  const [owner, repo] = fullName.split('/')
+  const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
+  const response = await githubFetch(`${path}/readme`, {
+    raw: true,
+    accept: 'application/vnd.github.raw',
+  }).catch(() => null)
+  if (!response) return null
+
+  const readme = await response.text().catch(() => '')
+  for (const url of extractImageUrls(readme)) {
+    const resolved = resolveImageUrl(url, fullName)
+    if (!resolved || isBadgeUrl(resolved) || isSvgImage(resolved)) continue
+    return resolved
+  }
+  return null
 }
 
 function topicToCategory(topics = []) {
@@ -157,16 +275,18 @@ async function fetchContributors(path) {
 async function fetchRepoDetails(fullName) {
   const [owner, repo] = fullName.split('/')
   const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
-  const [details, languages, contributors] = await Promise.all([
+  const [details, languages, contributors, image] = await Promise.all([
     githubFetch(path).catch(() => null),
     githubFetch(`${path}/languages`).catch(() => ({})),
     fetchContributors(path),
+    fetchReadmeImage(fullName),
   ])
   return {
     languages: toLanguageShares(languages),
     subscribers: details?.subscribers_count ?? 0,
     contributors: contributors.contributors,
     contributorsCount: contributors.contributorsCount,
+    image,
   }
 }
 
@@ -222,6 +342,7 @@ export async function getProjects({ refresh = false, query, sort, perPage } = {}
       project.watchers = details.subscribers
       project.contributors = details.contributors
       project.contributorsCount = details.contributorsCount
+      project.image = details.image
       if (project.languages.length === 0) continue
 
       projects.push(project)
