@@ -136,6 +136,8 @@ const BADGE_HOSTS = [
   'liberapay.com',
   'www.patreon.com',
   'snyk.io',
+  'app.snyk.io',
+  'img.snyk.io',
   'githbadges.com',
   'php-eye.com',
   'scrutinizer-ci.com',
@@ -146,6 +148,7 @@ const BADGE_HOSTS = [
   'maven-badges.herokuapp.com',
   'badges.gitter.im',
   'img.gitter.im',
+  'gitter.im',
   'badge.waffle.io',
   'api.greenkeeper.io',
   'api.bitrise.io',
@@ -156,6 +159,18 @@ const BADGE_HOSTS = [
   'repostatus.org',
   'www.repostatus.org',
   'api.repostatus.org',
+  'img.loopo.de',
+  'jitpack.io',
+  'badges.herokuapp.com',
+  'www.versioneye.com',
+  'buildstatus.ow2.org',
+  'mypy-lang.org',
+  'zenhub.com',
+  'codebeat.co',
+  'www.codebeat.co',
+  'badges.frapsoft.com',
+  'badge-size.herokuapp.com',
+  'asciinema.org',
 ]
 
 const BADGE_URL_PATTERNS = [
@@ -165,6 +180,21 @@ const BADGE_URL_PATTERNS = [
   /\/badges\//i,
   /\/shields\//i,
   /[?&]badge=/i,
+  /\/badge\.(svg|png|gif)$/i,
+  /\/status\/[^/]+\.(svg|png|gif)$/i,
+  /\/ci\/[^/]+\.(svg|png|gif)$/i,
+  /\/build\/[^/]+\.(svg|png|gif)$/i,
+  /\/coverage\/[^/]+\.(svg|png|gif)$/i,
+  /\/version\/[^/]+\.(svg|png|gif)$/i,
+  /\/downloads\/[^/]+\.(svg|png|gif)$/i,
+  /\/stars\/[^/]+\.(svg|png|gif)$/i,
+  /\/license\/[^/]+\.(svg|png|gif)$/i,
+  /\/warning\//i,
+  /\/\.svg$/i,
+  /\/badge-/i,
+  /[?&](?:status|build|version|coverage|license|downloads|stars)=(?:svg|png|gif)/i,
+  /github\.com\/[^/]+\/[^/]+\/actions\/workflows\//i,
+  /github\.com\/[^/]+\/[^/]+\/workflows\//i,
 ]
 
 function isBadgeUrl(url) {
@@ -174,8 +204,17 @@ function isBadgeUrl(url) {
     if (BADGE_HOSTS.some((badge) => normalized === badge || normalized.endsWith(`.${badge}`))) {
       return true
     }
+    if (/badge|shields|badgen|\.svg$/i.test(url)) {
+      return true
+    }
   }
-  return BADGE_URL_PATTERNS.some((pattern) => pattern.test(url))
+  if (BADGE_URL_PATTERNS.some((pattern) => pattern.test(url))) {
+    return true
+  }
+  if (/[?&](?:badge|label|style|logo|color|logoColor|link)=/i.test(url)) {
+    return true
+  }
+  return false
 }
 
 function isSvgImage(url) {
