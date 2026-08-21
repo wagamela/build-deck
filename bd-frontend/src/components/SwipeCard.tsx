@@ -96,6 +96,7 @@ export default function SwipeCard({
   total,
   imageLoaded,
 }: SwipeCardProps) {
+  const deck = Math.floor((position - 1) / 12) + 1;
   const contributors = project.contributors?.slice(0, 3) ?? [];
   const contributorsCount = project.contributorsCount ?? 0;
   const extraContributors = Math.max(0, contributorsCount - contributors.length);
@@ -109,8 +110,7 @@ export default function SwipeCard({
             {project.category}
           </span>
           <span className="font-mono text-[0.7rem] text-muted/60">
-            {String(position).padStart(2, "0")} /{" "}
-            {String(total).padStart(2, "0")}
+            deck {String(deck).padStart(2, "0")}
           </span>
         </div>
 

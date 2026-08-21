@@ -103,8 +103,12 @@ function Step({ icon, label, hint }: StepProps) {
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] bg-surface text-muted">
         {icon}
       </span>
-      <span className="truncate text-[13px] font-medium text-text">{label}</span>
-      <span className="ml-auto shrink-0 font-mono text-[11px] text-muted/60">{hint}</span>
+      <span className="truncate text-[13px] font-medium text-text">
+        {label}
+      </span>
+      <span className="ml-auto shrink-0 font-mono text-[11px] text-muted/60">
+        {hint}
+      </span>
     </li>
   );
 }
@@ -143,11 +147,13 @@ function IntroOverlay({ onDismiss }: IntroOverlayProps) {
             aria-label="Close instructions"
             className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
           >
-<X className="h-3.5 w-3.5" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
 
-        <h2 className="mt-3 font-display text-xl text-text">Swipe to discover</h2>
+        <h2 className="mt-3 font-display text-xl text-text">
+          Swipe to discover
+        </h2>
         <p className="mt-2 text-[13px] leading-relaxed text-muted">
           Flip through real projects like a deck of cards. Swipe to decide, or
           use A / D or the arrow keys.
@@ -279,8 +285,7 @@ function DebugPanel({
           <div className="flex items-center justify-between gap-3">
             <dt className="text-muted/60">view</dt>
             <dd className="text-text">
-              deck {String(activeIndex + 1).padStart(2, "0")} /{" "}
-              {String(total).padStart(2, "0")}
+              deck {String(Math.floor(activeIndex / 12) + 1).padStart(2, "0")}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3">
@@ -332,7 +337,9 @@ function DebugPanel({
         <DebugButton onClick={onResetDeck}>Reset deck</DebugButton>
         <DebugButton onClick={onClearHistory}>Clear history</DebugButton>
         <DebugButton onClick={onShowIntro}>Show intro</DebugButton>
-        <DebugButton onClick={handleCopy}>{copied ? "Copied" : "Copy JSON"}</DebugButton>
+        <DebugButton onClick={handleCopy}>
+          {copied ? "Copied" : "Copy JSON"}
+        </DebugButton>
         <DebugButton onClick={onToggleOutlines} active={outlines}>
           {outlines ? "Hide outlines" : "Show outlines"}
         </DebugButton>
@@ -527,7 +534,11 @@ function App() {
   const { projects, usingFallback, loadMore } = useProjects();
   if (projects.length === 0) return <LoadingState />;
   return (
-    <Deck projects={projects} usingFallback={usingFallback} onRefill={loadMore} />
+    <Deck
+      projects={projects}
+      usingFallback={usingFallback}
+      onRefill={loadMore}
+    />
   );
 }
 
@@ -622,7 +633,11 @@ function Deck({
       if (event.key === "ArrowRight" || key === "d" || event.code === "KeyD") {
         event.preventDefault();
         action = () => controlsRef.current?.like();
-      } else if (event.key === "ArrowLeft" || key === "a" || event.code === "KeyA") {
+      } else if (
+        event.key === "ArrowLeft" ||
+        key === "a" ||
+        event.code === "KeyA"
+      ) {
         event.preventDefault();
         action = () => controlsRef.current?.skip();
       }
@@ -677,8 +692,7 @@ function Deck({
         <Wordmark />
         <div className="flex items-center gap-3">
           <span className="font-mono text-[0.75rem] text-muted">
-            deck {String(activeIndex + 1).padStart(2, "0")} /{" "}
-            {String(total).padStart(2, "0")}
+            Deck {String(Math.floor(activeIndex / 12) + 1).padStart(2, "0")}
           </span>
           <button
             type="button"
