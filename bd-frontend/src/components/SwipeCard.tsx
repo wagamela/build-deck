@@ -22,16 +22,27 @@ function formatCount(count: number) {
   return String(count);
 }
 
-function ProjectPreview({ project }: { project: Project }) {
+function ProjectPreview({
+  project,
+  imageLoaded,
+}: {
+  project: Project;
+  imageLoaded: boolean;
+}) {
+  const showImage = project.image && imageLoaded;
+
   return (
     <div className="relative min-h-0 flex-1">
-      {project.image ? (
+      {project.image && (
         <img
           src={project.image}
           alt={`${project.name} screenshot`}
-          className="absolute inset-0 h-full w-full bg-surface object-contain object-center"
+          className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
+            showImage ? "opacity-100" : "opacity-0"
+          }`}
         />
-      ) : (
+      )}
+      {(!project.image || !showImage) && (
         <div className="absolute inset-0 overflow-hidden bg-surface">
           <div
             className="absolute inset-0 opacity-20"
@@ -76,12 +87,14 @@ interface SwipeCardProps {
   project: Project;
   position: number;
   total: number;
+  imageLoaded: boolean;
 }
 
 export default function SwipeCard({
   project,
   position,
   total,
+  imageLoaded,
 }: SwipeCardProps) {
   const contributors = project.contributors?.slice(0, 3) ?? [];
   const contributorsCount = project.contributorsCount ?? 0;
@@ -119,7 +132,7 @@ export default function SwipeCard({
         </div>
 
         <div className="mt-4 flex h-40 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface">
-          <ProjectPreview project={project} />
+          <ProjectPreview project={project} imageLoaded={imageLoaded} />
         </div>
 
         <div className="mt-4 flex items-center gap-5">
