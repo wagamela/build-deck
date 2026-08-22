@@ -195,7 +195,7 @@ export default function SwipeCard({
           </div>
         )}
 
-        <p className="mt-4 line-clamp-3 text-[13px] leading-relaxed text-muted">
+        <p className="mt-4 text-[13px] leading-relaxed text-muted">
           {project.description}
         </p>
 
