@@ -12,7 +12,7 @@ const SWIPE_THRESHOLD = 100;
 const TILT_PER_PX = 0.08;
 const MAX_TILT = 18;
 const FLYOUT_MS = 450;
-const REFILL_THRESHOLD = 4;
+const REFILL_THRESHOLD = 8;
 const BACK_COLORS = ["#17171d", "#141419", "#191922", "#131318", "#16161c"];
 
 export interface DeckControls {
