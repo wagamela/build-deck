@@ -73,7 +73,7 @@ export default function DiscoveryDeck({
 
   const total = deck.length;
   const topIndex = counter;
-  const position = topIndex + 1;
+  const _position = topIndex + 1;
   const { isLoaded } = useImagePreloader(deck, topIndex);
   const stack = [0, 1, 2].flatMap((offset) => {
     const project = deck[topIndex + offset];
@@ -208,7 +208,7 @@ export default function DiscoveryDeck({
               onPointerCancel={handlePointerCancel}
               onTransitionEnd={handleTransitionEnd}
             >
-              <SwipeCard project={project} position={position} total={total} imageLoaded={isLoaded(project.image)} />
+              <SwipeCard project={project} total={total} imageLoaded={isLoaded(project.image)} />
               <div
                 className="pointer-events-none absolute right-4 top-5 z-10 rounded-md border-2 border-success bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-success"
                 style={{ transform: "rotate(12deg)", opacity: likeProgress }}

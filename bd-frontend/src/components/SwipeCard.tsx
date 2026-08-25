@@ -85,18 +85,15 @@ function ProjectPreview({
 
 interface SwipeCardProps {
   project: Project;
-  position: number;
   total: number;
   imageLoaded: boolean;
 }
 
 export default function SwipeCard({
   project,
-  position,
   total,
   imageLoaded,
 }: SwipeCardProps) {
-  const deck = Math.floor((position - 1) / 12) + 1;
   const contributors = project.contributors?.slice(0, 3) ?? [];
   const contributorsCount = project.contributorsCount ?? 0;
   const extraContributors = Math.max(0, contributorsCount - contributors.length);
@@ -109,11 +106,7 @@ export default function SwipeCard({
             <GitHubMark className="h-3.5 w-3.5 text-muted" />
             {project.category}
           </span>
-          <span className="font-mono text-[0.7rem] text-muted/60">
-            deck {String(deck).padStart(2, "0")}
-          </span>
         </div>
-
         <div className="mt-5">
           <p className="flex items-center gap-2 text-xs font-medium text-muted">
             {project.ownerAvatarUrl && (

@@ -283,12 +283,6 @@ function DebugPanel({
         <h3 className="eyebrow text-muted/60">State</h3>
         <dl className="mt-2 space-y-1 font-mono text-[11px]">
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-muted/60">view</dt>
-            <dd className="text-9xl">
-              deck {String(Math.floor(activeIndex / 12) + 1).padStart(2, "0")}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-3">
             <dt className="text-muted/60">position</dt>
             <dd className="text-text">{activeIndex}</dd>
           </div>
@@ -691,9 +685,7 @@ function Deck({
       <header className="flex items-center justify-between px-5 pt-6 sm:px-8 lg:px-10">
         <Wordmark />
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[0.75rem] text-muted">
-            Deck {String(Math.floor(activeIndex / 12) + 1).padStart(2, "0")}
-          </span>
+          
           <button
             type="button"
             onClick={() => setDebugOpen((open) => !open)}
