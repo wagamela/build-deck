@@ -107,7 +107,7 @@ export default function SwipeCard({
             {project.category}
           </span>
         </div>
-        <div className="mt-5">
+        <div className="mt-3">
           <p className="flex items-center gap-2 text-xs font-medium text-muted">
             {project.ownerAvatarUrl && (
               <img
@@ -124,11 +124,11 @@ export default function SwipeCard({
           </h2>
         </div>
 
-        <div className="mt-4 flex h-40 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface">
+        <div className="mt-3 flex h-40 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface">
           <ProjectPreview project={project} imageLoaded={imageLoaded} />
         </div>
 
-        <div className="mt-4 flex items-center gap-5">
+        <div className="mt-3 flex items-center gap-5">
           <div>
             <p className="flex items-center gap-1.5 text-lg font-semibold text-text">
               <Star className="h-4 w-4 text-muted" />
@@ -161,7 +161,7 @@ export default function SwipeCard({
         </div>
 
         {showContributors && (
-          <div className="mt-4 flex items-center gap-2.5">
+          <div className="mt-3 flex items-center gap-2.5">
             <div className="flex items-center">
               {contributors.map((contributor, index) => (
                 <img
@@ -188,11 +188,11 @@ export default function SwipeCard({
           </div>
         )}
 
-        <p className="mt-4 text-[13px] leading-relaxed text-muted">
+        <p className="mt-2 text-[13px] leading-relaxed text-muted">
           {project.description}
         </p>
 
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
             {project.languages.map((language) => (
               <span
@@ -209,7 +209,7 @@ export default function SwipeCard({
             ))}
           </div>
           <div
-            className="mt-3 flex h-1 w-full overflow-hidden rounded-full bg-surface"
+            className="mt-2 flex h-1 w-full overflow-hidden rounded-full bg-surface"
             role="img"
             aria-label={`Language mix: ${project.languages.map((language) => `${language.name} ${language.share}%`).join(", ")}`}
           >
