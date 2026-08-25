@@ -7,6 +7,7 @@ import {
   X,
 } from "lucide-react";
 import DiscoveryDeck, { type DeckControls } from "./components/DiscoveryDeck";
+import NotFoundPage from "./components/NotFoundPage";
 import { useProjects } from "./hooks/useProjects";
 import type { Project } from "./data/projects";
 
@@ -223,6 +224,7 @@ interface DebugPanelProps {
   outlines: boolean;
   onToggleOutlines: () => void;
   onShowIntro: () => void;
+  onShowNotFound: () => void;
   onResetDeck: () => void;
   onClearHistory: () => void;
   onClose: () => void;
@@ -237,6 +239,7 @@ function DebugPanel({
   outlines,
   onToggleOutlines,
   onShowIntro,
+  onShowNotFound,
   onResetDeck,
   onClearHistory,
   onClose,
@@ -331,6 +334,7 @@ function DebugPanel({
         <DebugButton onClick={onResetDeck}>Reset deck</DebugButton>
         <DebugButton onClick={onClearHistory}>Clear history</DebugButton>
         <DebugButton onClick={onShowIntro}>Show intro</DebugButton>
+        <DebugButton onClick={onShowNotFound}>Show 404</DebugButton>
         <DebugButton onClick={handleCopy}>
           {copied ? "Copied" : "Copy JSON"}
         </DebugButton>
@@ -526,6 +530,7 @@ function LoadingState() {
 
 function App() {
   const { projects, usingFallback, loadMore } = useProjects();
+  if (window.location.pathname !== "/") return <NotFoundPage />;
   if (projects.length === 0) return <LoadingState />;
   return (
     <Deck
@@ -552,6 +557,7 @@ function Deck({
   );
   const [debugOpen, setDebugOpen] = useState(false);
   const [outlines, setOutlines] = useState(false);
+  const [showNotFound, setShowNotFound] = useState(false);
   const historyIdRef = useRef(0);
   const controlsRef = useRef<DeckControls | null>(null);
   const lastKeyActionRef = useRef(0);
@@ -677,12 +683,17 @@ function Deck({
           outlines={outlines}
           onToggleOutlines={handleToggleOutlines}
           onShowIntro={handleShowIntro}
+          onShowNotFound={() => setShowNotFound((v) => !v)}
           onResetDeck={handleResetDeck}
           onClearHistory={handleClearHistory}
           onClose={() => setDebugOpen(false)}
         />
       )}
-      <header className="flex items-center justify-between px-5 pt-6 sm:px-8 lg:px-10">
+      {showNotFound ? (
+        <NotFoundPage />
+      ) : (
+        <>
+          <header className="flex items-center justify-between px-5 pt-6 sm:px-8 lg:px-10">
         <Wordmark />
         <div className="flex items-center gap-3">
           
@@ -724,6 +735,8 @@ function Deck({
           <ProjectPanel />
         </aside>
       </div>
+      </>
+      )}
     </main>
   );
 }
