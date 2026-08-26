@@ -5,7 +5,7 @@ function NotFoundPage() {
     <main className="app-bg flex h-dvh flex-col items-center justify-center px-5 text-text">
       <div className="flex flex-col items-center gap-6 text-center">
         <span
-          className="font-display text-[8rem] font-bold leading-none tracking-tighter text-primary/30 sm:text-[10rem]"
+          className="font-display text-[6rem] font-bold leading-none tracking-tighter text-primary/30 sm:text-[8rem] md:text-[10rem]"
           aria-hidden="true"
         >
           404

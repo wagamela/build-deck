@@ -4,6 +4,8 @@ import {
   ArrowLeftRight,
   ArrowRight,
   ArrowUpRight,
+  Clock,
+  Link2,
   X,
 } from "lucide-react";
 import DiscoveryDeck, { type DeckControls } from "./components/DiscoveryDeck";
@@ -268,7 +270,7 @@ function DebugPanel({
     <aside
       role="dialog"
       aria-label="Debug mode"
-      className="fixed bottom-4 right-4 z-40 flex max-h-[min(84vh,42rem)] w-[20rem] flex-col rounded-xl border border-line bg-surface shadow-modal"
+      className="fixed bottom-4 right-4 z-40 flex max-h-[min(84vh,42rem)] w-[min(20rem,calc(100vw-2rem))] flex-col rounded-xl border border-line bg-surface shadow-modal"
     >
       <div className="flex items-center justify-between border-b border-line px-4 py-3">
         <span className="eyebrow text-muted">Debug mode</span>
@@ -483,7 +485,7 @@ interface ActionBarProps {
 
 function ActionBar({ onLike, onPass }: ActionBarProps) {
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-2 sm:gap-3">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -502,7 +504,7 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
-      <div className="flex h-8 items-center gap-3 rounded-full border border-line bg-surface px-4 text-xs text-muted">
+      <div className="hidden h-8 items-center gap-3 rounded-full border border-line bg-surface px-4 text-xs text-muted sm:flex">
         <span className="flex items-center gap-1.5 font-medium">
           <ArrowLeftRight className="h-4 w-4" />
           swipe the card
@@ -558,6 +560,8 @@ function Deck({
   const [debugOpen, setDebugOpen] = useState(false);
   const [outlines, setOutlines] = useState(false);
   const [showNotFound, setShowNotFound] = useState(false);
+  const [leftPanelOpen, setLeftPanelOpen] = useState(false);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
   const historyIdRef = useRef(0);
   const controlsRef = useRef<DeckControls | null>(null);
   const lastKeyActionRef = useRef(0);
@@ -693,10 +697,26 @@ function Deck({
         <NotFoundPage />
       ) : (
         <>
-          <header className="flex items-center justify-between px-5 pt-6 sm:px-8 lg:px-10">
+          <header className="flex items-center justify-between px-4 pt-4 sm:px-6 sm:pt-5 lg:px-10">
         <Wordmark />
-        <div className="flex items-center gap-3">
-          
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setLeftPanelOpen(true)}
+            aria-label="Open past cards"
+            className="flex h-7 items-center gap-1.5 rounded-md border border-line px-2 text-[11px] font-medium text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text lg:hidden"
+          >
+            <Clock className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{String(history.length).padStart(2, "0")}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setRightPanelOpen(true)}
+            aria-label="Open project info"
+            className="flex h-7 items-center gap-1.5 rounded-md border border-line px-2 text-[11px] font-medium text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text lg:hidden"
+          >
+            <Link2 className="h-3.5 w-3.5" />
+          </button>
           <button
             type="button"
             onClick={() => setDebugOpen((open) => !open)}
@@ -712,7 +732,7 @@ function Deck({
         </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-5 px-5 pb-6 pt-2 sm:px-8 lg:grid-cols-[13rem_minmax(0,1fr)_12rem] lg:gap-6 lg:px-10">
+      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-4 px-4 pb-4 pt-2 sm:gap-5 sm:px-6 sm:pb-6 lg:grid-cols-[13rem_minmax(0,1fr)_12rem] lg:gap-6 lg:px-10">
         <aside className="hidden h-[min(64vh,38rem)] lg:flex">
           <PastCards history={history} onRevisit={handleRevisit} />
         </aside>
@@ -735,7 +755,67 @@ function Deck({
           <ProjectPanel />
         </aside>
       </div>
-      </>
+        </>
+      )}
+
+      {leftPanelOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/50 animate-fade-in lg:hidden"
+            onClick={() => setLeftPanelOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed inset-y-0 left-0 z-40 flex w-[min(80vw,20rem)] animate-slide-in-left lg:hidden">
+            <div className="flex h-full w-full flex-col border-r border-line bg-neutral p-3">
+              <div className="flex items-center justify-between px-2 pb-3 pt-1">
+                <span className="eyebrow text-muted">Past cards</span>
+                <button
+                  type="button"
+                  onClick={() => setLeftPanelOpen(false)}
+                  aria-label="Close past cards"
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <PastCards
+                history={history}
+                onRevisit={(index) => {
+                  handleRevisit(index);
+                  setLeftPanelOpen(false);
+                }}
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {rightPanelOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/50 animate-fade-in lg:hidden"
+            onClick={() => setRightPanelOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed inset-y-0 right-0 z-40 flex w-[min(80vw,20rem)] animate-slide-in-right lg:hidden">
+            <div className="flex h-full w-full flex-col border-l border-line bg-neutral p-3">
+              <div className="flex items-center justify-between px-2 pb-3 pt-1">
+                <span className="eyebrow text-muted">Project info</span>
+                <button
+                  type="button"
+                  onClick={() => setRightPanelOpen(false)}
+                  aria-label="Close project info"
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-muted transition-colors duration-100 hover:bg-elevated hover:text-text"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto sidebar-scroll">
+                <ProjectPanel />
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </main>
   );

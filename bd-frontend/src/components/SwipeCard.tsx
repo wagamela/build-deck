@@ -100,14 +100,14 @@ export default function SwipeCard({
   const showContributors = contributors.length > 0 || contributorsCount > 0;
   return (
     <article className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-line bg-neutral">
-      <div className="flex min-h-0 flex-1 flex-col px-6 pb-4 pt-5">
+      <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-4 sm:px-6 sm:pt-5">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
             <GitHubMark className="h-3.5 w-3.5 text-muted" />
             {project.category}
           </span>
         </div>
-        <div className="mt-3">
+        <div className="mt-1.5 sm:mt-3">
           <p className="flex items-center gap-2 text-xs font-medium text-muted">
             {project.ownerAvatarUrl && (
               <img
@@ -119,16 +119,16 @@ export default function SwipeCard({
             )}
             <span>by {project.owner}</span>
           </p>
-          <h2 className="mt-1 font-display text-[1.75rem] leading-tight text-text">
+          <h2 className="mt-1 font-display text-[1.25rem] leading-tight text-text sm:text-[1.75rem]">
             {project.name}
           </h2>
         </div>
 
-        <div className="mt-3 flex h-40 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface">
+        <div className="mt-1.5 flex h-24 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface sm:mt-3 sm:h-40">
           <ProjectPreview project={project} imageLoaded={imageLoaded} />
         </div>
 
-        <div className="mt-3 flex items-center gap-5">
+        <div className="mt-1.5 flex items-center gap-3 sm:mt-3 sm:gap-5">
           <div>
             <p className="flex items-center gap-1.5 text-lg font-semibold text-text">
               <Star className="h-4 w-4 text-muted" />
@@ -161,7 +161,7 @@ export default function SwipeCard({
         </div>
 
         {showContributors && (
-          <div className="mt-3 flex items-center gap-2.5">
+          <div className="mt-1.5 flex items-center gap-2.5 sm:mt-3">
             <div className="flex items-center">
               {contributors.map((contributor, index) => (
                 <img
@@ -188,7 +188,7 @@ export default function SwipeCard({
           </div>
         )}
 
-        <p className="mt-2 text-[13px] leading-relaxed text-muted">
+        <p className="mt-1.5 line-clamp-3 text-[13px] leading-relaxed text-muted sm:mt-2">
           {project.description}
         </p>
 

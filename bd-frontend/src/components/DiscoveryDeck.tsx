@@ -192,7 +192,7 @@ export default function DiscoveryDeck({
       : "transition-transform duration-300 ease-spring";
 
   return (
-    <div className="relative h-[min(64vh,38rem)] w-[min(92vw,28.5rem)] select-none">
+    <div className="relative h-[min(56vh,38rem)] w-[min(92vw,28.5rem)] select-none sm:h-[min(64vh,38rem)]">
       {stack.map(({ project, key, offset }) => {
         if (offset === 0) {
           const arriveClass =
