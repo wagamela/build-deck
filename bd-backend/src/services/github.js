@@ -1,3 +1,5 @@
+import { get as cacheGet, set as cacheSet } from '../cache.js'
+
 const GITHUB_API = 'https://api.github.com'
 const DEFAULT_COUNT = 12
 const FETCH_BUFFER = 18
@@ -353,6 +355,13 @@ export async function getProjects({ refresh = false, query, sort, perPage } = {}
   }
 
   const target = Math.min(perPage || DEFAULT_COUNT, 30)
+
+  if (!refresh) {
+    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}`
+    const cached = cacheGet(cacheKey)
+    if (cached) return cached
+  }
+
   const projects = []
   let page = cursorPage
   let scanned = 0
@@ -398,6 +407,11 @@ export async function getProjects({ refresh = false, query, sort, perPage } = {}
   if (projects.length < target && scanned > 0) {
     seenRepos = new Set()
     cursorPage = 1
+  }
+
+  if (!refresh) {
+    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}`
+    cacheSet(cacheKey, projects)
   }
 
   return projects
