@@ -15,10 +15,10 @@ function projectKey(project: Project) {
 }
 
 export function useProjects(): UseProjectsResult {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(fallbackProjects);
   const [error, setError] = useState<string | null>(null);
   const [usingFallback, setUsingFallback] = useState(false);
-  const seenRef = useRef(new Set<string>());
+  const seenRef = useRef(new Set(fallbackProjects.map(projectKey)));
 
   const mergeUnique = useCallback((incoming: Project[]): Project[] => {
     return incoming.filter((project) => {
@@ -58,14 +58,14 @@ export function useProjects(): UseProjectsResult {
     async function loadInitial() {
       try {
         const batch = await fetchBatch(controller.signal);
-        setProjects(mergeUnique(batch));
+        setProjects(batch);
+        seenRef.current = new Set(batch.map(projectKey));
       } catch (err) {
         if (controller.signal.aborted) return;
         setError(
           err instanceof Error ? err.message : "Could not load projects",
         );
         setUsingFallback(true);
-        setProjects(mergeUnique(fallbackProjects));
       }
     }
 

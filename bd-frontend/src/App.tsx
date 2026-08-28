@@ -519,19 +519,9 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
   );
 }
 
-function LoadingState() {
-  return (
-    <main className="app-bg flex h-dvh flex-col items-center justify-center gap-5 text-text">
-      <DeckMark className="h-11 w-11 animate-pulse" />
-      <p className="font-mono text-xs text-muted">dealing the deck…</p>
-    </main>
-  );
-}
-
 function App() {
   const { projects, usingFallback, loadMore } = useProjects();
   if (window.location.pathname !== "/") return <NotFoundPage />;
-  if (projects.length === 0) return <LoadingState />;
   return (
     <Deck
       projects={projects}
