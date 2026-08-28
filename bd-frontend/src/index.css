@@ -22,6 +22,22 @@
   --shadow-glow: 0 0 24px rgb(94 106 210 / 0.15);
 }
 
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/Inter-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-latin.woff2") format("woff2");
+}
+
 @utility font-display {
   font-family: var(--font-sans);
   font-weight: 600;
