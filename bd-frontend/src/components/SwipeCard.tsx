@@ -111,6 +111,8 @@ export default function SwipeCard({
               <img
                 src={project.ownerAvatarUrl}
                 alt={`${project.owner} profile photo`}
+                width="20"
+                height="20"
                 loading="lazy"
                 className="h-5 w-5 rounded-full border border-line bg-surface"
               />
@@ -166,6 +168,8 @@ export default function SwipeCard({
                   key={contributor.login}
                   src={contributor.avatarUrl}
                   alt={`${contributor.login} profile photo`}
+                  width="24"
+                  height="24"
                   loading="lazy"
                   className="h-6 w-6 rounded-full border-2 border-neutral bg-surface object-cover"
                   style={{ marginLeft: index === 0 ? 0 : -7 }}
