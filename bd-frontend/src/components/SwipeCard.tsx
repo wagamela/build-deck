@@ -85,13 +85,11 @@ function ProjectPreview({
 
 interface SwipeCardProps {
   project: Project;
-  total: number;
   imageLoaded: boolean;
 }
 
 export default function SwipeCard({
   project,
-  total,
   imageLoaded,
 }: SwipeCardProps) {
   const contributors = project.contributors?.slice(0, 3) ?? [];

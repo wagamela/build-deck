@@ -220,7 +220,6 @@ function DebugButton({
 interface DebugPanelProps {
   project: Project;
   activeIndex: number;
-  total: number;
   history: HistoryEntry[];
   showIntro: boolean;
   outlines: boolean;
@@ -235,7 +234,6 @@ interface DebugPanelProps {
 function DebugPanel({
   project,
   activeIndex,
-  total,
   history,
   showIntro,
   outlines,
@@ -656,8 +654,6 @@ function Deck({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const total = projects.length;
-
   return (
     <main
       className={`app-bg flex h-dvh flex-col overflow-hidden text-text ${
@@ -681,7 +677,6 @@ function Deck({
         <DebugPanel
           project={projects[activeIndex]}
           activeIndex={activeIndex}
-          total={total}
           history={history}
           showIntro={showIntro}
           outlines={outlines}
