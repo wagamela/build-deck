@@ -206,7 +206,7 @@ export default function DiscoveryDeck({
               onPointerCancel={handlePointerCancel}
               onTransitionEnd={handleTransitionEnd}
             >
-              <SwipeCard project={project} imageLoaded={isLoaded(project.image)} />
+              <SwipeCard project={project} imageLoaded={isLoaded(project.image)} isLCP={offset === 0} />
               <div
                 className="pointer-events-none absolute right-4 top-5 z-10 rounded-md border-2 border-success bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-success"
                 style={{ transform: "rotate(12deg)", opacity: likeProgress }}

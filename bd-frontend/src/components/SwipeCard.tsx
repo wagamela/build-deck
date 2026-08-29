@@ -25,9 +25,11 @@ function formatCount(count: number) {
 function ProjectPreview({
   project,
   imageLoaded,
+  isLCP,
 }: {
   project: Project;
   imageLoaded: boolean;
+  isLCP?: boolean;
 }) {
   const showImage = project.image && imageLoaded;
 
@@ -40,7 +42,8 @@ function ProjectPreview({
           width={400}
           height={240}
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw"
-          loading="lazy"
+          loading={isLCP ? "eager" : "lazy"}
+          fetchPriority={isLCP ? "high" : "low"}
           className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
             showImage ? "opacity-100" : "opacity-0"
           }`}
@@ -90,11 +93,13 @@ function ProjectPreview({
 interface SwipeCardProps {
   project: Project;
   imageLoaded: boolean;
+  isLCP?: boolean;
 }
 
 export default function SwipeCard({
   project,
   imageLoaded,
+  isLCP,
 }: SwipeCardProps) {
   const contributors = project.contributors?.slice(0, 2) ?? [];
   const contributorsCount = project.contributorsCount ?? 0;
@@ -129,7 +134,7 @@ export default function SwipeCard({
         </div>
 
         <div className="mt-1.5 flex h-24 shrink-0 flex-col overflow-hidden rounded-md border border-line bg-surface sm:mt-3 sm:h-40">
-          <ProjectPreview project={project} imageLoaded={imageLoaded} />
+          <ProjectPreview project={project} imageLoaded={imageLoaded} isLCP={isLCP} />
         </div>
 
         <div className="mt-1.5 flex items-center gap-3 sm:mt-3 sm:gap-5">
