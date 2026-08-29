@@ -37,6 +37,10 @@ function ProjectPreview({
         <img
           src={project.image}
           alt={`${project.name} screenshot`}
+          width={400}
+          height={240}
+          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw"
+          loading="lazy"
           className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
             showImage ? "opacity-100" : "opacity-0"
           }`}
@@ -92,7 +96,7 @@ export default function SwipeCard({
   project,
   imageLoaded,
 }: SwipeCardProps) {
-  const contributors = project.contributors?.slice(0, 3) ?? [];
+  const contributors = project.contributors?.slice(0, 2) ?? [];
   const contributorsCount = project.contributorsCount ?? 0;
   const extraContributors = Math.max(0, contributorsCount - contributors.length);
   const showContributors = contributors.length > 0 || contributorsCount > 0;
