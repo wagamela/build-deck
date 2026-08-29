@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ArrowUpRight, Eye, GitFork, Star } from "lucide-react";
 import type { Project } from "../data/projects";
 
@@ -96,7 +97,7 @@ interface SwipeCardProps {
   isLCP?: boolean;
 }
 
-export default function SwipeCard({
+export default memo(function SwipeCard({
   project,
   imageLoaded,
   isLCP,
@@ -250,4 +251,4 @@ export default function SwipeCard({
       </a>
     </article>
   );
-}
+});

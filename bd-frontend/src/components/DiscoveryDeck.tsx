@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   PointerEvent as ReactPointerEvent,
   TransitionEvent as ReactTransitionEvent,
@@ -73,18 +73,33 @@ export default function DiscoveryDeck({
 
   const topIndex = counter;
   const { isLoaded } = useImagePreloader(deck, topIndex);
-  const stack = [0, 1, 2].flatMap((offset) => {
-    const project = deck[topIndex + offset];
-    return project ? [{ project, key: counter + offset, offset }] : [];
-  });
+  const stack = useMemo(() => {
+    return [0, 1, 2].flatMap((offset) => {
+      const project = deck[topIndex + offset];
+      return project ? [{ project, key: counter + offset, offset }] : [];
+    });
+  }, [deck, topIndex, counter]);
 
   useEffect(() => {
     if (deck.length - topIndex > REFILL_THRESHOLD) return;
     if (refillInFlightRef.current) return;
-    refillInFlightRef.current = true;
-    Promise.resolve(onRefillRef.current?.()).finally(() => {
-      refillInFlightRef.current = false;
-    });
+
+    let cancelled = false;
+    const scheduleRefill = () => {
+      if (cancelled) return;
+      refillInFlightRef.current = true;
+      Promise.resolve(onRefillRef.current?.()).finally(() => {
+        refillInFlightRef.current = false;
+      });
+    };
+
+    if (typeof requestIdleCallback !== "undefined") {
+      const handle = requestIdleCallback(scheduleRefill);
+      return () => { cancelled = true; cancelIdleCallback(handle); };
+    }
+
+    const timer = setTimeout(scheduleRefill, 0);
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [topIndex, deck.length]);
 
   const tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, dx * TILT_PER_PX));

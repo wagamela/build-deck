@@ -16,6 +16,7 @@ router.get('/projects', async (req, res) => {
       sort: sort || undefined,
       perPage: perPage ? Number(perPage) : undefined,
     })
+    res.set('Cache-Control', 'public, max-age=300, s-maxage=600')
     res.json(projects)
   } catch (error) {
     res.status(502).json({ error: error.message })
