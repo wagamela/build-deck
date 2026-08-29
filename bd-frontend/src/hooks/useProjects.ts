@@ -30,8 +30,9 @@ export function useProjects(): UseProjectsResult {
   }, []);
 
   const fetchBatch = useCallback(
-    async (signal?: AbortSignal): Promise<Project[]> => {
-      const response = await fetch(`${API_BASE}/projects`, { signal });
+    async ({ perPage, signal }: { perPage?: number; signal?: AbortSignal } = {}): Promise<Project[]> => {
+      const url = perPage ? `${API_BASE}/projects?per_page=${perPage}` : `${API_BASE}/projects`;
+      const response = await fetch(url, { signal });
       if (!response.ok) {
         throw new Error(`API responded with ${response.status}`);
       }
@@ -57,7 +58,7 @@ export function useProjects(): UseProjectsResult {
 
     async function loadInitial() {
       try {
-        const batch = await fetchBatch(controller.signal);
+        const batch = await fetchBatch({ perPage: 3, signal: controller.signal });
         setProjects(batch);
         seenRef.current = new Set(batch.map(projectKey));
       } catch (err) {

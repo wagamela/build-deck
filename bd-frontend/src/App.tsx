@@ -391,8 +391,13 @@ function Deck({
       lastKeyActionRef.current = now;
       action();
     }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    const timer = setTimeout(() => {
+      window.addEventListener("keydown", handleKeyDown);
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   return (
