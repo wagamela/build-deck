@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { ArrowUpRight, Eye, GitFork, Star } from "lucide-react";
 import type { Project } from "../data/projects";
 
@@ -32,7 +32,8 @@ function ProjectPreview({
   imageLoaded: boolean;
   isLCP?: boolean;
 }) {
-  const showImage = project.image && imageLoaded;
+  const [nativeLoaded, setNativeLoaded] = useState(false);
+  const showImage = project.image && (imageLoaded || nativeLoaded);
 
   return (
     <div className="relative min-h-0 flex-1">
@@ -45,6 +46,7 @@ function ProjectPreview({
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw"
           loading={isLCP ? "eager" : "lazy"}
           fetchPriority={isLCP ? "high" : "low"}
+          onLoad={() => setNativeLoaded(true)}
           className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
             showImage ? "opacity-100" : "opacity-0"
           }`}
