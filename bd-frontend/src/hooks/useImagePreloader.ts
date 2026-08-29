@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "../data/projects";
 
-const PRELOAD_AHEAD = 1;
+const PRELOAD_AHEAD = typeof window !== "undefined" && window.innerWidth < 640 ? 0 : 1;
 
 export function useImagePreloader(projects: Project[], currentIndex: number) {
   const [loadedSet, setLoadedSet] = useState<Set<string>>(new Set());
