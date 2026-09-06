@@ -313,13 +313,26 @@ async function fetchContributors(path) {
   return { contributors, contributorsCount }
 }
 
-async function fetchRepoDetails(fullName) {
+async function fetchRepoDetails(fullName, { light = false } = {}) {
   const [owner, repo] = fullName.split('/')
   const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
-  const [details, languages, contributors, image] = await Promise.all([
+  const baseCalls = [
     githubFetch(path).catch(() => null),
     githubFetch(`${path}/languages`).catch(() => ({})),
     fetchContributors(path),
+  ]
+  if (light) {
+    const [details, languages, contributors] = await Promise.all(baseCalls)
+    return {
+      languages: toLanguageShares(languages),
+      subscribers: details?.subscribers_count ?? 0,
+      contributors: contributors.contributors,
+      contributorsCount: contributors.contributorsCount,
+      image: null,
+    }
+  }
+  const [details, languages, contributors, image] = await Promise.all([
+    ...baseCalls,
     fetchReadmeImage(fullName),
   ])
   return {
@@ -330,9 +343,6 @@ async function fetchRepoDetails(fullName) {
     image,
   }
 }
-
-let seenRepos = new Set()
-let cursorPage = 1
 
 function repoKey(repo) {
   return repo.full_name.toLowerCase()
@@ -348,23 +358,20 @@ function excluded(repo) {
   )
 }
 
-export async function getProjects({ refresh = false, query, sort, perPage } = {}) {
-  if (refresh) {
-    seenRepos = new Set()
-    cursorPage = 1
-  }
-
+export async function getProjects({ refresh = false, query, sort, perPage, light = false } = {}) {
   const target = Math.min(perPage || DEFAULT_COUNT, 30)
 
   if (!refresh) {
-    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}`
+    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}:${light ? 'light' : 'full'}`
     const cached = cacheGet(cacheKey)
     if (cached) return cached
   }
 
-  const projects = []
-  let page = cursorPage
+  let localSeenRepos = refresh ? new Set() : new Set()
+  let page = 1
   let scanned = 0
+
+  const projects = []
 
   while (projects.length < target && scanned < MAX_SCAN) {
     const params = new URLSearchParams({
@@ -380,37 +387,45 @@ export async function getProjects({ refresh = false, query, sort, perPage } = {}
     scanned += items.length
     if (items.length === 0) break
 
-    for (const repo of items) {
-      if (projects.length >= target) break
-      if (excluded(repo) || seenRepos.has(repoKey(repo))) continue
+    const candidates = items.filter((repo) => {
+      if (excluded(repo) || localSeenRepos.has(repoKey(repo))) return false
+      localSeenRepos.add(repoKey(repo))
+      return true
+    })
 
+    if (candidates.length === 0) {
+      page += 1
+      continue
+    }
+
+    const enrichments = await Promise.all(
+      candidates.map((repo) =>
+        fetchRepoDetails(repo.full_name, { light }).then((details) => ({
+          repo,
+          details,
+        })).catch(() => null)
+      )
+    )
+
+    for (const result of enrichments) {
+      if (projects.length >= target) break
+      if (!result) continue
+      const { repo, details } = result
       const project = mapRepo(repo)
-      const details = await fetchRepoDetails(repo.full_name)
       project.languages = details.languages
       project.watchers = details.subscribers
       project.contributors = details.contributors
       project.contributorsCount = details.contributorsCount
       project.image = details.image
       if (project.languages.length === 0) continue
-
       projects.push(project)
-      seenRepos.add(repoKey(repo))
     }
 
     page += 1
   }
 
-  cursorPage = page
-
-  // Scanned a wide range but couldn't fill the batch, meaning every result
-  // in range has already been shown — let the next request start over.
-  if (projects.length < target && scanned > 0) {
-    seenRepos = new Set()
-    cursorPage = 1
-  }
-
   if (!refresh) {
-    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}`
+    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}:${light ? 'light' : 'full'}`
     cacheSet(cacheKey, projects)
   }
 

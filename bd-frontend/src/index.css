@@ -93,6 +93,15 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .animate-slide-in-left {
   animation: slide-in-left 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -105,11 +114,23 @@
   animation: fade-in 0.2s ease forwards;
 }
 
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 25%,
+    var(--color-elevated) 50%,
+    var(--color-surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-card-arrive,
   .animate-slide-in-left,
   .animate-slide-in-right,
-  .animate-fade-in {
+  .animate-fade-in,
+  .animate-shimmer {
     animation: none;
   }
 }

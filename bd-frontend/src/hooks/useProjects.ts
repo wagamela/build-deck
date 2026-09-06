@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { fallbackProjects, type Project } from "../data/projects";
+import type { Project } from "../data/projects";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "/api";
 
 export interface UseProjectsResult {
   projects: Project[];
   error: string | null;
-  usingFallback: boolean;
+  loading: boolean;
   loadMore: () => Promise<void>;
 }
 
@@ -15,10 +15,10 @@ function projectKey(project: Project) {
 }
 
 export function useProjects(): UseProjectsResult {
-  const [projects, setProjects] = useState<Project[]>(fallbackProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [usingFallback, setUsingFallback] = useState(false);
-  const seenRef = useRef(new Set(fallbackProjects.map(projectKey)));
+  const [loading, setLoading] = useState(true);
+  const seenRef = useRef(new Set<string>());
 
   const mergeUnique = useCallback((incoming: Project[]): Project[] => {
     return incoming.filter((project) => {
@@ -30,8 +30,12 @@ export function useProjects(): UseProjectsResult {
   }, []);
 
   const fetchBatch = useCallback(
-    async ({ perPage, signal }: { perPage?: number; signal?: AbortSignal } = {}): Promise<Project[]> => {
-      const url = perPage ? `${API_BASE}/projects?per_page=${perPage}` : `${API_BASE}/projects`;
+    async ({ perPage, signal, light }: { perPage?: number; signal?: AbortSignal; light?: boolean } = {}): Promise<Project[]> => {
+      const params = new URLSearchParams();
+      if (perPage) params.set("per_page", String(perPage));
+      if (light) params.set("light", "1");
+      const qs = params.toString();
+      const url = qs ? `${API_BASE}/projects?${qs}` : `${API_BASE}/projects`;
       const response = await fetch(url, { signal });
       if (!response.ok) {
         throw new Error(`API responded with ${response.status}`);
@@ -49,7 +53,7 @@ export function useProjects(): UseProjectsResult {
         setProjects((current) => [...current, ...fresh]);
       }
     } catch {
-      // Background refills are best-effort; keep whatever we already have.
+      // Background refills are best-effort
     }
   }, [fetchBatch, mergeUnique]);
 
@@ -58,15 +62,26 @@ export function useProjects(): UseProjectsResult {
 
     async function loadInitial() {
       try {
-        const batch = await fetchBatch({ perPage: 3, signal: controller.signal });
-        setProjects(batch);
-        seenRef.current = new Set(batch.map(projectKey));
+        setLoading(true);
+
+        const firstBatch = await fetchBatch({ perPage: 1, signal: controller.signal });
+        const uniqueFirst = mergeUnique(firstBatch);
+        if (uniqueFirst.length > 0) {
+          setProjects(uniqueFirst);
+        }
+        setLoading(false);
+
+        const restBatch = await fetchBatch({ perPage: 11, signal: controller.signal });
+        const uniqueRest = mergeUnique(restBatch);
+        if (uniqueRest.length > 0) {
+          setProjects((current) => [...current, ...uniqueRest]);
+        }
       } catch (err) {
         if (controller.signal.aborted) return;
         setError(
           err instanceof Error ? err.message : "Could not load projects",
         );
-        setUsingFallback(true);
+        setLoading(false);
       }
     }
 
@@ -75,5 +90,5 @@ export function useProjects(): UseProjectsResult {
     return () => controller.abort();
   }, [fetchBatch, mergeUnique]);
 
-  return { projects, error, usingFallback, loadMore };
+  return { projects, error, loading, loadMore };
 }

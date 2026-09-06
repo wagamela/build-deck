@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 import DiscoveryDeck, { type DeckControls } from "./components/DiscoveryDeck";
+import SkeletonCard from "./components/SkeletonCard";
 import { useProjects } from "./hooks/useProjects";
 import type { Project } from "./data/projects";
 import type { HistoryEntry } from "./components/DebugPanel";
@@ -265,7 +266,7 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
 }
 
 function App() {
-  const { projects, usingFallback, loadMore } = useProjects();
+  const { projects, loading, loadMore } = useProjects();
   if (window.location.pathname !== "/") {
     return (
       <Suspense fallback={null}>
@@ -276,7 +277,7 @@ function App() {
   return (
     <Deck
       projects={projects}
-      usingFallback={usingFallback}
+      loading={loading}
       onRefill={loadMore}
     />
   );
@@ -284,11 +285,11 @@ function App() {
 
 function Deck({
   projects,
-  usingFallback,
+  loading,
   onRefill,
 }: {
   projects: Project[];
-  usingFallback: boolean;
+  loading: boolean;
   onRefill: () => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -406,18 +407,6 @@ function Deck({
         outlines ? "debug-outlines" : ""
       }`}
     >
-      {usingFallback && (
-        <div className="fixed left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 shadow-modal">
-          <span
-            className="h-1.5 w-1.5 shrink-0 rounded-full"
-            style={{ backgroundColor: "#f0c000" }}
-            aria-hidden="true"
-          />
-          <p className="whitespace-nowrap text-xs text-muted">
-            API unreachable — showing sample projects
-          </p>
-        </div>
-      )}
       {showIntro && (
         <Suspense fallback={null}>
           <IntroOverlay onDismiss={dismissIntro} />
@@ -487,13 +476,21 @@ function Deck({
         </aside>
 
         <section className="relative flex min-h-0 flex-col items-center justify-center gap-7">
-          <DiscoveryDeck
-            deck={projects}
-            controlsRef={controlsRef}
-            onDecision={handleDecision}
-            onActiveChange={handleActiveChange}
-            onRefill={onRefill}
-          />
+          {loading && projects.length === 0 ? (
+            <div className="relative h-[min(56vh,38rem)] w-[min(92vw,28.5rem)] sm:h-[min(64vh,38rem)]">
+              <div className="absolute inset-0 z-20 animate-card-arrive">
+                <SkeletonCard />
+              </div>
+            </div>
+          ) : (
+            <DiscoveryDeck
+              deck={projects}
+              controlsRef={controlsRef}
+              onDecision={handleDecision}
+              onActiveChange={handleActiveChange}
+              onRefill={onRefill}
+            />
+          )}
           <ActionBar
             onLike={() => controlsRef.current?.like()}
             onPass={() => controlsRef.current?.skip()}

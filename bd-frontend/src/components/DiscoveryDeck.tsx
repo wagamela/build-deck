@@ -5,6 +5,7 @@ import type {
 } from "react";
 import type { Project } from "../data/projects";
 import { useImagePreloader } from "../hooks/useImagePreloader";
+import { useImagePreloadLink } from "../hooks/useImagePreloadLink";
 import CardBack from "./CardBack";
 import SwipeCard from "./SwipeCard";
 
@@ -73,6 +74,8 @@ export default function DiscoveryDeck({
 
   const topIndex = counter;
   const { isLoaded } = useImagePreloader(deck, topIndex);
+  const activeImage = deck[topIndex]?.image;
+  useImagePreloadLink(activeImage);
   const stack = useMemo(() => {
     return [0, 1, 2].flatMap((offset) => {
       const project = deck[topIndex + offset];
@@ -221,7 +224,7 @@ export default function DiscoveryDeck({
               onPointerCancel={handlePointerCancel}
               onTransitionEnd={handleTransitionEnd}
             >
-              <SwipeCard project={project} imageLoaded={isLoaded(project.image)} isLCP={offset === 0} />
+              <SwipeCard project={project} imageLoaded={isLoaded(project.image)} />
               <div
                 className="pointer-events-none absolute right-4 top-5 z-10 rounded-md border-2 border-success bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-success"
                 style={{ transform: "rotate(12deg)", opacity: likeProgress }}
