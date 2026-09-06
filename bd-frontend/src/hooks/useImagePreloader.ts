@@ -19,9 +19,12 @@ export function useImagePreloader(projects: Project[], currentIndex: number) {
 
       const img = new Image();
       loadingRef.current.set(url, img);
-      img.onload = img.onerror = () => {
+      img.onload = () => {
         loadingRef.current.delete(url);
         setLoadedSet((prev) => new Set(prev).add(url));
+      };
+      img.onerror = () => {
+        loadingRef.current.delete(url);
       };
       img.src = proxyUrl(url, 800);
     }

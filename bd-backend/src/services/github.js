@@ -101,6 +101,7 @@ function resolveImageUrl(src, fullName) {
   let url = src.trim().replace(/^<(.*)>$/, '$1').trim()
   if (!url || /^data:/i.test(url)) return null
   if (/^https?:\/\//i.test(url)) return url
+  if (/^\/\//.test(url)) return `https:${url}`
 
   const clean = url.replace(/^\.?\/+/, '')
   if (!clean) return null

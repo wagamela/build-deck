@@ -7,7 +7,11 @@ const ALLOWED_HOSTS = [
   'github.com',
   'raw.githubusercontent.com',
   'avatars.githubusercontent.com',
+  'user-images.githubusercontent.com',
+  'camo.githubusercontent.com',
 ]
+
+const GITHUBusercontentWildcard = /\.githubusercontent\.com$/
 
 const MAX_WIDTH = 1200
 const DEFAULT_WIDTH = 800
@@ -16,6 +20,7 @@ const REQUEST_TIMEOUT_MS = 10_000
 function isAllowedHost(url) {
   try {
     const { hostname } = new URL(url)
+    if (GITHUBusercontentWildcard.test(hostname)) return true
     return ALLOWED_HOSTS.some(
       (host) => hostname === host || hostname.endsWith(`.${host}`)
     )
@@ -51,10 +56,12 @@ router.get('/', async (req, res) => {
   const { url, w, fmt } = req.query
 
   if (!url || typeof url !== 'string') {
+    res.set('Cache-Control', 'no-store')
     return res.status(400).json({ error: 'Missing "url" query parameter' })
   }
 
   if (!isAllowedHost(url)) {
+    res.set('Cache-Control', 'no-store')
     return res.status(403).json({ error: 'Domain not allowed' })
   }
 
@@ -73,11 +80,13 @@ router.get('/', async (req, res) => {
     clearTimeout(timeout)
 
     if (!upstream.ok) {
+      res.set('Cache-Control', 'no-store')
       return res.status(502).json({ error: `Upstream returned ${upstream.status}` })
     }
 
     const contentType = upstream.headers.get('content-type') || ''
     if (!contentType.startsWith('image/')) {
+      res.set('Cache-Control', 'no-store')
       return res.status(422).json({ error: 'URL does not point to an image' })
     }
 
@@ -86,6 +95,7 @@ router.get('/', async (req, res) => {
     if (!format) {
       res.set('Cache-Control', 'public, max-age=86400, immutable')
       res.set('Content-Type', contentType)
+      res.set('Content-Length', String(buffer.length))
       res.set('Vary', 'Accept')
       return res.send(buffer)
     }
@@ -102,9 +112,11 @@ router.get('/', async (req, res) => {
 
     res.set('Cache-Control', 'public, max-age=86400, immutable')
     res.set('Content-Type', contentTypeFor(format))
+    res.set('Content-Length', String(result.data.length))
     res.set('Vary', 'Accept')
     res.send(result.data)
   } catch (error) {
+    res.set('Cache-Control', 'no-store')
     if (error.name === 'AbortError') {
       return res.status(504).json({ error: 'Upstream request timed out' })
     }
