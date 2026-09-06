@@ -1,33 +1,14 @@
 import { Router } from 'express'
 import sharp from 'sharp'
+import { assertProxyableImageUrl } from '../image-hosts.js'
 
 const router = Router()
-
-const ALLOWED_HOSTS = [
-  'github.com',
-  'raw.githubusercontent.com',
-  'avatars.githubusercontent.com',
-  'user-images.githubusercontent.com',
-  'camo.githubusercontent.com',
-]
-
-const GITHUBusercontentWildcard = /\.githubusercontent\.com$/
 
 const MAX_WIDTH = 1200
 const DEFAULT_WIDTH = 800
 const REQUEST_TIMEOUT_MS = 10_000
-
-function isAllowedHost(url) {
-  try {
-    const { hostname } = new URL(url)
-    if (GITHUBusercontentWildcard.test(hostname)) return true
-    return ALLOWED_HOSTS.some(
-      (host) => hostname === host || hostname.endsWith(`.${host}`)
-    )
-  } catch {
-    return false
-  }
-}
+const MAX_BYTES = 12 * 1024 * 1024
+const MAX_REDIRECTS = 4
 
 function parseWidth(value) {
   if (!value) return DEFAULT_WIDTH
@@ -52,6 +33,47 @@ function contentTypeFor(format) {
   return 'image/png'
 }
 
+// fetch() follows redirects itself, which would let a public URL bounce to an
+// internal one unchecked. Walk the chain by hand and re-validate each hop.
+async function fetchImage(startUrl, signal) {
+  let url = startUrl
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    if (!(await assertProxyableImageUrl(url))) {
+      return { error: 'forbidden' }
+    }
+    const response = await fetch(url, {
+      signal,
+      redirect: 'manual',
+      headers: {
+        'User-Agent': 'BuildDeck-ImageProxy/1.0',
+        Accept: 'image/*,*/*;q=0.8',
+      },
+    })
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      if (!location) return { error: 'upstream', status: response.status }
+      url = new URL(location, url).toString()
+      continue
+    }
+    return { response }
+  }
+  return { error: 'too-many-redirects' }
+}
+
+async function readCapped(response) {
+  const declared = Number(response.headers.get('content-length'))
+  if (Number.isFinite(declared) && declared > MAX_BYTES) return null
+
+  const chunks = []
+  let total = 0
+  for await (const chunk of response.body) {
+    total += chunk.length
+    if (total > MAX_BYTES) return null
+    chunks.push(chunk)
+  }
+  return Buffer.concat(chunks)
+}
+
 router.get('/', async (req, res) => {
   const { url, w, fmt } = req.query
 
@@ -60,67 +82,76 @@ router.get('/', async (req, res) => {
     return res.status(400).json({ error: 'Missing "url" query parameter' })
   }
 
-  if (!isAllowedHost(url)) {
-    res.set('Cache-Control', 'no-store')
-    return res.status(403).json({ error: 'Domain not allowed' })
-  }
-
   const width = parseWidth(w)
   const accept = req.get('accept') || ''
   const format = negotiateFormat(accept, fmt)
 
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
   try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+    const { response: upstream, error } = await fetchImage(url, controller.signal)
 
-    const upstream = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'BuildDeck-ImageProxy/1.0' },
-    })
-    clearTimeout(timeout)
-
-    if (!upstream.ok) {
+    if (error === 'forbidden') {
       res.set('Cache-Control', 'no-store')
-      return res.status(502).json({ error: `Upstream returned ${upstream.status}` })
+      return res.status(403).json({ error: 'Host not permitted' })
+    }
+    if (error || !upstream.ok) {
+      res.set('Cache-Control', 'no-store')
+      return res
+        .status(502)
+        .json({ error: `Upstream returned ${upstream?.status ?? error}` })
     }
 
     const contentType = upstream.headers.get('content-type') || ''
-    if (!contentType.startsWith('image/')) {
+    const looksLikeImage =
+      contentType.startsWith('image/') || contentType === 'application/octet-stream'
+    if (!looksLikeImage) {
       res.set('Cache-Control', 'no-store')
       return res.status(422).json({ error: 'URL does not point to an image' })
     }
 
-    const buffer = Buffer.from(await upstream.arrayBuffer())
+    const buffer = await readCapped(upstream)
+    if (!buffer) {
+      res.set('Cache-Control', 'no-store')
+      return res.status(413).json({ error: 'Image too large' })
+    }
 
-    if (!format) {
+    // Animated GIFs stay as-is; re-encoding them to a still frame loses the
+    // content, and the doc's advice there is to ship video, not a resize.
+    if (!format || contentType === 'image/gif') {
       res.set('Cache-Control', 'public, max-age=86400, immutable')
-      res.set('Content-Type', contentType)
+      res.set('Content-Type', contentType.startsWith('image/') ? contentType : 'image/png')
       res.set('Content-Length', String(buffer.length))
       res.set('Vary', 'Accept')
       return res.send(buffer)
     }
 
-    const pipeline = sharp(buffer).rotate()
-    if (format === 'avif') {
-      pipeline.avif({ quality: 80, effort: 4 })
-    } else {
-      pipeline.webp({ quality: 80 })
-    }
+    // density lifts SVG rasterisation to the requested width instead of the
+    // nominal 72dpi box, which otherwise renders vector art blurry.
+    const pipeline = sharp(buffer, { density: 200 }).rotate()
     pipeline.resize({ width, withoutEnlargement: true })
+    if (format === 'avif') {
+      pipeline.avif({ quality: 60, effort: 4 })
+    } else {
+      pipeline.webp({ quality: 78 })
+    }
 
-    const result = await pipeline.toBuffer({ resolveWithObject: true })
+    const result = await pipeline.toBuffer()
 
     res.set('Cache-Control', 'public, max-age=86400, immutable')
     res.set('Content-Type', contentTypeFor(format))
-    res.set('Content-Length', String(result.data.length))
+    res.set('Content-Length', String(result.length))
     res.set('Vary', 'Accept')
-    res.send(result.data)
-  } catch (error) {
+    res.send(result)
+  } catch (err) {
     res.set('Cache-Control', 'no-store')
-    if (error.name === 'AbortError') {
+    if (err.name === 'AbortError') {
       return res.status(504).json({ error: 'Upstream request timed out' })
     }
     return res.status(500).json({ error: 'Image processing failed' })
+  } finally {
+    clearTimeout(timeout)
   }
 })
 

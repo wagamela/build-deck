@@ -1,4 +1,5 @@
 import { get as cacheGet, set as cacheSet } from '../cache.js'
+import { isProxyableImageUrl } from '../image-hosts.js'
 
 const GITHUB_API = 'https://api.github.com'
 const DEFAULT_COUNT = 12
@@ -96,12 +97,23 @@ function extractImageUrls(readme) {
   return urls
 }
 
+// github.com/<owner>/<repo>/blob/<ref>/<path> serves an HTML page, not the
+// image bytes. The /raw/ form redirects, but raw.githubusercontent.com is
+// already on the proxy allowlist, so rewrite both to it directly.
+function normalizeGithubBlobUrl(url) {
+  const match = url.match(
+    /^https?:\/\/(?:www\.)?github\.com\/([^/]+\/[^/]+)\/(?:blob|raw)\/(.+)$/i
+  )
+  if (!match) return url
+  return `https://raw.githubusercontent.com/${match[1]}/${match[2]}`
+}
+
 function resolveImageUrl(src, fullName) {
   if (!src) return null
   let url = src.trim().replace(/^<(.*)>$/, '$1').trim()
   if (!url || /^data:/i.test(url)) return null
-  if (/^https?:\/\//i.test(url)) return url
-  if (/^\/\//.test(url)) return `https:${url}`
+  if (/^\/\//.test(url)) url = `https:${url}`
+  if (/^https?:\/\//i.test(url)) return normalizeGithubBlobUrl(url)
 
   const clean = url.replace(/^\.?\/+/, '')
   if (!clean) return null
@@ -193,7 +205,6 @@ const BADGE_URL_PATTERNS = [
   /\/stars\/[^/]+\.(svg|png|gif)$/i,
   /\/license\/[^/]+\.(svg|png|gif)$/i,
   /\/warning\//i,
-  /\/\.svg$/i,
   /\/badge-/i,
   /[?&](?:status|build|version|coverage|license|downloads|stars)=(?:svg|png|gif)/i,
   /github\.com\/[^/]+\/[^/]+\/actions\/workflows\//i,
@@ -207,7 +218,10 @@ function isBadgeUrl(url) {
     if (BADGE_HOSTS.some((badge) => normalized === badge || normalized.endsWith(`.${badge}`))) {
       return true
     }
-    if (/badge|shields|badgen|\.svg$/i.test(url)) {
+    // Note: no blanket `.svg` rule here. Plenty of projects ship a real SVG
+    // banner, and the badge hosts and URL patterns below already catch the
+    // shields-style ones.
+    if (/badge|shields|badgen/i.test(url)) {
       return true
     }
   }
@@ -220,26 +234,76 @@ function isBadgeUrl(url) {
   return false
 }
 
-function isSvgImage(url) {
-  return /\.svg(\?|#|$)/i.test(url)
+// Images that are real content but not a picture *of the project*: contributor
+// avatar grids, star-history charts, sponsor walls, generated social cards.
+const NON_CONTENT_HOSTS = [
+  'avatars.githubusercontent.com',
+  'contrib.rocks',
+  'contributors-img.web.app',
+  'api.star-history.com',
+  'star-history.com',
+  'opengraph.githubassets.com',
+  'github-readme-stats.vercel.app',
+  'streak-stats.demolab.com',
+  'komarev.com',
+  'visitor-badge.laobi.icu',
+  'profile-counter.glitch.me',
+]
+
+function isNonContentImage(url) {
+  const host = (url.match(/^https?:\/\/([^/?#]+)/i) || [])[1]?.toLowerCase()
+  if (host && NON_CONTENT_HOSTS.some((h) => host === h || host.endsWith(`.${h}`))) {
+    return true
+  }
+  return /\/(?:contributors?|sponsors?)[-_.]?(?:img|image|grid|wall)?\.(?:png|jpg|jpeg|svg)/i.test(url)
 }
 
-async function fetchReadmeImage(fullName) {
+// Prefer the image that actually shows the project. READMEs put their hero
+// near the top, so document order is the tiebreaker; these adjustments only
+// override it when the filename says something meaningful.
+const SCREENSHOT_HINT = /screenshot|screen-shot|demo|preview|hero|banner|cover|example|showcase|ui|dashboard/i
+const LOGO_HINT = /logo|icon|favicon|wordmark|avatar/i
+const RASTER_EXT = /\.(png|jpe?g|webp|avif|gif)(\?|#|$)/i
+
+function scoreImage(url, order) {
+  let score = -order
+  if (SCREENSHOT_HINT.test(url)) score += 40
+  if (LOGO_HINT.test(url)) score -= 25
+  if (RASTER_EXT.test(url)) score += 8
+  if (/\.svg(\?|#|$)/i.test(url)) score -= 4
+  return score
+}
+
+const MAX_IMAGE_CANDIDATES = 3
+
+async function fetchReadmeImages(fullName) {
   const [owner, repo] = fullName.split('/')
   const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
   const response = await githubFetch(`${path}/readme`, {
     raw: true,
     accept: 'application/vnd.github.raw',
   }).catch(() => null)
-  if (!response) return null
+  if (!response) return []
 
   const readme = await response.text().catch(() => '')
+
+  const seen = new Set()
+  const candidates = []
   for (const url of extractImageUrls(readme)) {
     const resolved = resolveImageUrl(url, fullName)
-    if (!resolved || isBadgeUrl(resolved) || isSvgImage(resolved)) continue
-    return resolved
+    if (!resolved || seen.has(resolved)) continue
+    if (isBadgeUrl(resolved) || isNonContentImage(resolved)) continue
+    // Everything is rendered through /api/image-proxy, so drop anything the
+    // proxy would refuse rather than handing the card a doomed URL.
+    if (!isProxyableImageUrl(resolved)) continue
+    seen.add(resolved)
+    candidates.push({ url: resolved, order: candidates.length })
   }
-  return null
+
+  return candidates
+    .sort((a, b) => scoreImage(b.url, b.order) - scoreImage(a.url, a.order))
+    .slice(0, MAX_IMAGE_CANDIDATES)
+    .map((candidate) => candidate.url)
 }
 
 function topicToCategory(topics = []) {
@@ -329,19 +393,19 @@ async function fetchRepoDetails(fullName, { light = false } = {}) {
       subscribers: details?.subscribers_count ?? 0,
       contributors: contributors.contributors,
       contributorsCount: contributors.contributorsCount,
-      image: null,
+      images: [],
     }
   }
-  const [details, languages, contributors, image] = await Promise.all([
+  const [details, languages, contributors, images] = await Promise.all([
     ...baseCalls,
-    fetchReadmeImage(fullName),
+    fetchReadmeImages(fullName),
   ])
   return {
     languages: toLanguageShares(languages),
     subscribers: details?.subscribers_count ?? 0,
     contributors: contributors.contributors,
     contributorsCount: contributors.contributorsCount,
-    image,
+    images,
   }
 }
 
@@ -417,7 +481,10 @@ export async function getProjects({ refresh = false, query, sort, perPage, light
       project.watchers = details.subscribers
       project.contributors = details.contributors
       project.contributorsCount = details.contributorsCount
-      project.image = details.image
+      // `images` is the fallback chain; `image` stays the primary so the card
+      // has something to render before any of them resolve.
+      project.images = details.images
+      project.image = details.images[0] ?? null
       if (project.languages.length === 0) continue
       projects.push(project)
     }

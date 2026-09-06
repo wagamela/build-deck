@@ -23,6 +23,8 @@ export interface Project {
   contributorsCount: number
   url: string
   image?: string
+  /** Ordered fallbacks from the README, best candidate first. */
+  images?: string[]
 }
 
 export const fallbackProjects: Project[] = [

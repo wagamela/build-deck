@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "../data/projects";
-import { proxyUrl } from "../lib/imageUrl";
+import { CARD_IMAGE_SIZES, cardSrcSet, proxyUrl } from "../lib/imageUrl";
 
 const PRELOAD_AHEAD = typeof window !== "undefined" && window.innerWidth < 640 ? 0 : 1;
 
@@ -26,7 +26,11 @@ export function useImagePreloader(projects: Project[], currentIndex: number) {
       img.onerror = () => {
         loadingRef.current.delete(url);
       };
-      img.src = proxyUrl(url, 800);
+      // Mirror the card's srcSet/sizes so the browser resolves this preload to
+      // the same candidate the card will render, and reuses it from cache.
+      img.sizes = CARD_IMAGE_SIZES;
+      img.srcset = cardSrcSet(url);
+      img.src = proxyUrl(url, 640);
     }
   }, [projects, currentIndex, loadedSet]);
 

@@ -1,7 +1,12 @@
 import { memo, useState } from "react";
 import { ArrowUpRight, Eye, GitFork, Star } from "lucide-react";
 import type { Project } from "../data/projects";
-import { pictureSources, proxyUrl } from "../lib/imageUrl";
+import {
+  CARD_IMAGE_SIZES,
+  RESPONSIVE_WIDTHS,
+  pictureSources,
+  proxyUrl,
+} from "../lib/imageUrl";
 
 function GitHubMark({ className }: { className?: string }) {
   return (
@@ -32,42 +37,59 @@ function ProjectPreview({
   imageLoaded: boolean;
 }) {
   const [nativeLoaded, setNativeLoaded] = useState(false);
-  const showImage = project.image && (imageLoaded || nativeLoaded);
+  // Walk the README's candidates in order: an upstream host can 404 or serve
+  // something sharp can't decode, and the next candidate is usually fine.
+  const [candidateIndex, setCandidateIndex] = useState(0);
+
+  const candidates = project.images?.length
+    ? project.images
+    : project.image
+      ? [project.image]
+      : [];
+  const source = candidates[candidateIndex];
+  const isPrimary = source === project.image;
+  const showImage = source && ((isPrimary && imageLoaded) || nativeLoaded);
 
   return (
     <div className="relative min-h-0 flex-1">
-      {project.image && (
-        <picture>
+      {source && (
+        <picture key={source}>
           {pictureSources(
-            project.image,
-            "(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw",
-          ).map((source) => (
+            source,
+            CARD_IMAGE_SIZES,
+          ).map((pictureSource) => (
             <source
-              key={source.type}
-              type={source.type}
-              srcSet={source.srcSet}
-              sizes={source.sizes}
+              key={pictureSource.type}
+              type={pictureSource.type}
+              srcSet={pictureSource.srcSet}
+              sizes={pictureSource.sizes}
             />
           ))}
           <img
-            src={proxyUrl(project.image, 800)}
-            srcSet={[400, 600, 800, 1200]
-              .map((w) => `${proxyUrl(project.image!, w)} ${w}w`)
-              .join(", ")}
+            src={proxyUrl(source, 640)}
+            srcSet={RESPONSIVE_WIDTHS.map(
+              (w) => `${proxyUrl(source, w)} ${w}w`,
+            ).join(", ")}
             alt={`${project.name} screenshot`}
             width={400}
             height={240}
-            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw"
+            sizes={CARD_IMAGE_SIZES}
             loading={"eager"}
             fetchPriority={"high"}
             onLoad={() => setNativeLoaded(true)}
+            onError={() => {
+              setNativeLoaded(false);
+              setCandidateIndex((index) =>
+                index + 1 < candidates.length ? index + 1 : index,
+              );
+            }}
             className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
               showImage ? "opacity-100" : "opacity-0"
             }`}
           />
         </picture>
       )}
-      {(!project.image || !showImage) && (
+      {!showImage && (
         <div className="absolute inset-0 overflow-hidden bg-surface">
           <div
             className="absolute inset-0 opacity-20"
