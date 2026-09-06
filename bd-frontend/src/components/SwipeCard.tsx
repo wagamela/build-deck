@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { ArrowUpRight, Eye, GitFork, Star } from "lucide-react";
 import type { Project } from "../data/projects";
+import { pictureSources, proxyUrl } from "../lib/imageUrl";
 
 function GitHubMark({ className }: { className?: string }) {
   return (
@@ -36,19 +37,35 @@ function ProjectPreview({
   return (
     <div className="relative min-h-0 flex-1">
       {project.image && (
-        <img
-          src={project.image}
-          alt={`${project.name} screenshot`}
-          width={400}
-          height={240}
-          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw"
-          loading={"eager"}
-          fetchPriority={"high"}
-          onLoad={() => setNativeLoaded(true)}
-          className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
-            showImage ? "opacity-100" : "opacity-0"
-          }`}
-        />
+        <picture>
+          {pictureSources(
+            project.image,
+            "(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw",
+          ).map((source) => (
+            <source
+              key={source.type}
+              type={source.type}
+              srcSet={source.srcSet}
+              sizes={source.sizes}
+            />
+          ))}
+          <img
+            src={proxyUrl(project.image, 800)}
+            srcSet={[400, 600, 800, 1200]
+              .map((w) => `${proxyUrl(project.image, w)} ${w}w`)
+              .join(", ")}
+            alt={`${project.name} screenshot`}
+            width={400}
+            height={240}
+            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 70vw, 50vw"
+            loading={"eager"}
+            fetchPriority={"high"}
+            onLoad={() => setNativeLoaded(true)}
+            className={`absolute inset-0 h-full w-full object-contain object-center transition-opacity duration-300 ${
+              showImage ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        </picture>
       )}
       {(!project.image || !showImage) && (
         <div className="absolute inset-0 overflow-hidden bg-surface">
