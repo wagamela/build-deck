@@ -137,7 +137,7 @@ export default memo(function SwipeCard({
           <p className="flex items-center gap-2 text-xs font-medium text-muted">
             {project.ownerAvatarUrl && (
               <img
-                src={project.ownerAvatarUrl}
+                src={proxyUrl(project.ownerAvatarUrl, 40, "webp")}
                 alt={`${project.owner} profile photo`}
                 width="20"
                 height="20"
@@ -197,7 +197,7 @@ export default memo(function SwipeCard({
               {contributors.map((contributor, index) => (
                 <img
                   key={contributor.login}
-                  src={contributor.avatarUrl}
+                  src={proxyUrl(contributor.avatarUrl, 48, "webp")}
                   alt={`${contributor.login} profile photo`}
                   width="24"
                   height="24"
