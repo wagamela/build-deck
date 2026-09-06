@@ -1,7 +1,10 @@
 import { Router } from 'express'
 import { getProjects } from '../services/github.js'
+import imageProxy from './image-proxy.js'
 
 const router = Router()
+
+router.use('/image-proxy', imageProxy)
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' })
