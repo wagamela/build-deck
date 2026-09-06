@@ -52,7 +52,7 @@ function ProjectPreview({
           <img
             src={proxyUrl(project.image, 800)}
             srcSet={[400, 600, 800, 1200]
-              .map((w) => `${proxyUrl(project.image, w)} ${w}w`)
+              .map((w) => `${proxyUrl(project.image!, w)} ${w}w`)
               .join(", ")}
             alt={`${project.name} screenshot`}
             width={400}
