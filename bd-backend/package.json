@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.1",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
