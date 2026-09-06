@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Project } from "../data/projects";
+import { proxyUrl } from "../lib/imageUrl";
 
 const PRELOAD_AHEAD = typeof window !== "undefined" && window.innerWidth < 640 ? 0 : 1;
 
@@ -22,7 +23,7 @@ export function useImagePreloader(projects: Project[], currentIndex: number) {
         loadingRef.current.delete(url);
         setLoadedSet((prev) => new Set(prev).add(url));
       };
-      img.src = url;
+      img.src = proxyUrl(url, 800);
     }
   }, [projects, currentIndex, loadedSet]);
 

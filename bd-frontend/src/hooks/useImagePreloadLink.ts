@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { proxyUrl } from "../lib/imageUrl";
 
 const REL = "preload";
 const AS = "image";
@@ -17,7 +18,7 @@ export function useImagePreloadLink(imageUrl: string | undefined) {
     const link = document.createElement("link");
     link.rel = REL;
     link.as = AS;
-    link.href = imageUrl;
+    link.href = proxyUrl(imageUrl, 800);
     document.head.appendChild(link);
     prevRef.current = link;
 
