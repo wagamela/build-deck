@@ -267,8 +267,6 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
 }
 
 function App() {
-  const { projects, loading, loadMore, recordDecision, tasteTopics } =
-    useProjects();
   if (window.location.pathname !== "/") {
     return (
       <Suspense fallback={null}>
@@ -276,6 +274,10 @@ function App() {
       </Suspense>
     );
   }
+
+  const { projects, loading, loadMore, recordDecision, tasteTopics } =
+    useProjects();
+
   return (
     <Deck
       projects={projects}
