@@ -12,7 +12,11 @@ router.get('/health', (req, res) => {
 
 router.get('/projects/first', async (req, res) => {
   try {
-    const projects = await getProjects({ perPage: 1, light: true })
+    // Randomize which page we fetch the first project from to avoid always showing
+    // the same repo on page reload. GitHub search is deterministic, so using random
+    // batch/page numbers ensures variety even when cache expires.
+    const randomBatch = Math.floor(Math.random() * 100) + 1
+    const projects = await getProjects({ perPage: 1, light: true, batch: randomBatch })
     res.set('Cache-Control', 'public, max-age=60, s-maxage=120')
     res.json(projects)
   } catch (error) {

@@ -77,7 +77,9 @@ export function useProjects(): UseProjectsResult {
       if (perPage) params.set("per_page", String(perPage));
       if (light) params.set("light", "1");
       if (topic) params.set("topic", topic);
-      if (batch && batch > 1) params.set("batch", String(batch));
+      // Always pass batch if specified, even if it's 1, to ensure consistent
+      // cache keys and randomization on page reload.
+      if (batch && batch > 0) params.set("batch", String(batch));
       const qs = params.toString();
       const url = qs ? `${API_BASE}/projects?${qs}` : `${API_BASE}/projects`;
       const response = await fetch(url, { signal });
@@ -144,9 +146,15 @@ export function useProjects(): UseProjectsResult {
       try {
         setLoading(true);
 
+        // Randomize starting batch to avoid always showing the same repos on reload.
+        // GitHub search results are deterministic for a given page, so varying the
+        // batch ensures variety even when server cache expires.
+        const randomInitialBatch = Math.floor(Math.random() * 100) + 1;
+
         const firstBatch = await fetchBatch({
           perPage: 1,
           signal: controller.signal,
+          batch: randomInitialBatch,
         });
         const uniqueFirst = mergeUnique(firstBatch);
         if (uniqueFirst.length > 0) {
@@ -157,6 +165,7 @@ export function useProjects(): UseProjectsResult {
         const restBatch = await fetchBatch({
           perPage: 11,
           signal: controller.signal,
+          batch: randomInitialBatch,
         });
         const uniqueRest = mergeUnique(restBatch);
         if (uniqueRest.length > 0) {
