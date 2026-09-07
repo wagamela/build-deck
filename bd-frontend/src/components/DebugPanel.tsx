@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import type { Project } from "../data/projects";
+import type { TasteTopic } from "../lib/taste";
 
 export interface HistoryEntry {
   id: number;
@@ -37,6 +38,7 @@ interface DebugPanelProps {
   project: Project;
   activeIndex: number;
   history: HistoryEntry[];
+  tasteTopics: TasteTopic[];
   showIntro: boolean;
   outlines: boolean;
   onToggleOutlines: () => void;
@@ -51,6 +53,7 @@ export default function DebugPanel({
   project,
   activeIndex,
   history,
+  tasteTopics,
   showIntro,
   outlines,
   onToggleOutlines,
@@ -114,6 +117,27 @@ export default function DebugPanel({
             <dd className="text-text">{history.length} entries</dd>
           </div>
         </dl>
+
+        <h3 className="eyebrow mt-5 text-muted/60">Taste profile</h3>
+        {tasteTopics.length === 0 ? (
+          <p className="mt-2 font-mono text-[11px] text-muted/60">
+            no signal yet
+          </p>
+        ) : (
+          <ul className="mt-2 flex flex-col gap-1">
+            {tasteTopics.map(({ topic, weight }) => (
+              <li
+                key={topic}
+                className="flex items-center gap-2 font-mono text-[11px] text-muted"
+              >
+                <span className="truncate text-text/70">{topic}</span>
+                <span className="ml-auto shrink-0 text-muted/60">
+                  {weight.toFixed(2)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <h3 className="eyebrow mt-5 text-muted/60">History</h3>
         {history.length === 0 ? (

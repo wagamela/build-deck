@@ -48,7 +48,7 @@ npm start        # Start production server
 - **CardBack** – Colored back of the stacked cards below the active card.
 
 **Key Hooks:**
-- `useProjects()` – Fetches paginated projects from `/api/projects` with caching and refill logic.
+- `useProjects()` – Fetches paginated projects from `/api/projects` with caching, refill logic, and taste-based reranking.
 - `useImagePreloader()` – Preloads images for the top 3 cards to ensure smooth swiping.
 - `useImagePreloadLink()` – Adds a link prefetch hint for the active card's image.
 
@@ -177,6 +177,27 @@ See **DESIGN_AVOIDS_GUIDELINE.md** for 30 specific patterns to avoid and guiding
 
 ---
 
+## Recommendation Algorithm
+
+The deck adapts to what the user likes. All model state lives in `bd-frontend/src/lib/taste.ts` and is session-only (an in-memory `TasteProfile`, never persisted).
+
+**Feature extraction** – Each project becomes a weighted bag of features: `topic:` (from the repo's GitHub topics, weight 1.0), `lang:` (scaled by the language's byte share, 0.6), `owner:` (0.35), and `word:` (stopword-filtered tokens from the name and description, 0.3).
+
+**Learning** – Every swipe calls `recordSwipe()`: a like adds `+1 x featureStrength` to each of the project's features, a pass adds `-0.55 x featureStrength`. Before the update, all existing weights decay by 0.94, so recent swipes outweigh old ones and the deck follows where a session is heading. Weights are clamped to ±6.
+
+**Reranking** – `rerankProjects()` scores each unseen card with `tanh(dot(profile, features) / sqrt(featureCount) / 2)` and greedily reorders. Three things keep it from becoming a filter bubble or a jarring UI:
+- `frozenUntil` (activeIndex + 2) protects cards already on screen and preloaded.
+- A stable per-project noise term (0.35 amplitude, hashed from `owner/name`) keeps unrelated cards in play without reshuffling the tail on every swipe.
+- A diversity penalty (0.22 per overlapping topic across the last 3 placements) prevents long runs of near-identical cards.
+
+**Query steering** – Reordering only works on repos already fetched, so refills are steered too. `pickSteerTopic()` samples a topic from the profile weighted by affinity (sampled, not argmax, so multi-interest sessions keep seeing everything) and `useProjects.loadMore()` passes it as `?topic=`. The backend converts it to a `topic:<t> stars:>300 pushed:>...` GitHub search and tops up from the general feed when the topic is too niche to fill a batch.
+
+**Batch paging** – `?batch=N` offsets the GitHub search start page (and is part of the backend cache key), so successive refills return new repos instead of the same cached page.
+
+The debug panel (Ctrl+Shift+D) shows the current top topics and their weights.
+
+---
+
 ## Common Development Tasks
 
 ### Adding a New API Endpoint
@@ -224,7 +245,8 @@ See **DESIGN_AVOIDS_GUIDELINE.md** for 30 specific patterns to avoid and guiding
 |------|---------|
 | `bd-frontend/src/App.tsx` | Main entry, state management, keyboard shortcuts |
 | `bd-frontend/src/components/DiscoveryDeck.tsx` | Card swipe logic, drag physics, animation |
-| `bd-frontend/src/hooks/useProjects.ts` | Pagination, refill, caching |
+| `bd-frontend/src/hooks/useProjects.ts` | Pagination, refill, caching, rerank + query steering |
+| `bd-frontend/src/lib/taste.ts` | Taste profile, scoring, reranking, topic steering |
 | `bd-frontend/vite.config.ts` | Build config, API proxy setup |
 | `bd-frontend/tsconfig.app.json` | TypeScript strict settings |
 | `bd-backend/src/server.js` | Express app startup |

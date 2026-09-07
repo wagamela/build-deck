@@ -13,6 +13,7 @@ import SkeletonCard from "./components/SkeletonCard";
 import { useProjects } from "./hooks/useProjects";
 import type { Project } from "./data/projects";
 import type { HistoryEntry } from "./components/DebugPanel";
+import type { TasteTopic } from "./lib/taste";
 
 const NotFoundPage = lazy(() => import("./components/NotFoundPage"));
 const IntroOverlay = lazy(() => import("./components/IntroOverlay"));
@@ -266,7 +267,8 @@ function ActionBar({ onLike, onPass }: ActionBarProps) {
 }
 
 function App() {
-  const { projects, loading, loadMore } = useProjects();
+  const { projects, loading, loadMore, recordDecision, tasteTopics } =
+    useProjects();
   if (window.location.pathname !== "/") {
     return (
       <Suspense fallback={null}>
@@ -279,6 +281,8 @@ function App() {
       projects={projects}
       loading={loading}
       onRefill={loadMore}
+      onRecordDecision={recordDecision}
+      tasteTopics={tasteTopics}
     />
   );
 }
@@ -287,10 +291,18 @@ function Deck({
   projects,
   loading,
   onRefill,
+  onRecordDecision,
+  tasteTopics,
 }: {
   projects: Project[];
   loading: boolean;
   onRefill: () => void;
+  onRecordDecision: (
+    index: number,
+    project: Project,
+    direction: "left" | "right",
+  ) => void;
+  tasteTopics: TasteTopic[];
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -318,6 +330,7 @@ function Deck({
   const handleDecision = useCallback(
     (direction: "left" | "right") => {
       const project = projects[activeIndex];
+      if (!project) return;
       setHistory((current) => [
         ...current,
         {
@@ -327,8 +340,10 @@ function Deck({
           direction,
         },
       ]);
+      // Teach the recommender what this swipe means before the next card lands.
+      onRecordDecision(activeIndex, project, direction);
     },
-    [activeIndex, projects],
+    [activeIndex, onRecordDecision, projects],
   );
 
   const handleRevisit = useCallback((index: number) => {
@@ -418,6 +433,7 @@ function Deck({
             project={projects[activeIndex]}
             activeIndex={activeIndex}
             history={history}
+            tasteTopics={tasteTopics}
             showIntro={showIntro}
             outlines={outlines}
             onToggleOutlines={handleToggleOutlines}

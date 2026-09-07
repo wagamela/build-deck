@@ -48,11 +48,26 @@ const LANGUAGE_COLORS = {
 
 const FALLBACK_LANGUAGE_COLOR = '#8a8f98'
 
+function pushedSince() {
+  return new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+}
+
 function defaultQuery() {
-  const pushedSince = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10)
-  return `stars:>1000 pushed:>${pushedSince}`
+  return `stars:>1000 pushed:>${pushedSince()}`
+}
+
+// GitHub topics are lowercase, digits and hyphens only. Anything else is
+// either a typo or an injection attempt into the search qualifier string.
+export function sanitizeTopic(raw) {
+  if (typeof raw !== 'string') return null
+  const topic = raw.trim().toLowerCase()
+  return /^[a-z0-9][a-z0-9-]{1,34}$/.test(topic) ? topic : null
+}
+
+// A steered search is narrower than the default feed, so the star floor drops
+// to keep niche topics from returning an empty page.
+function topicQuery(topic) {
+  return `topic:${topic} stars:>300 pushed:>${pushedSince()}`
 }
 
 function authHeaders() {
@@ -344,6 +359,9 @@ function mapRepo(repo) {
     ownerAvatarUrl: repo.owner.avatar_url,
     description: (repo.description || '').trim(),
     category: topicToCategory(repo.topics),
+    // Kept raw alongside the display category: the client's recommendation
+    // model scores cards on these.
+    topics: Array.isArray(repo.topics) ? repo.topics.slice(0, 12) : [],
     stars: repo.stargazers_count,
     forks: repo.forks_count,
     watchers: repo.subscribers_count,
@@ -423,24 +441,21 @@ function excluded(repo) {
   )
 }
 
-export async function getProjects({ refresh = false, query, sort, perPage, light = false } = {}) {
-  const target = Math.min(perPage || DEFAULT_COUNT, 30)
-
-  if (!refresh) {
-    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}:${light ? 'light' : 'full'}`
-    const cached = cacheGet(cacheKey)
-    if (cached) return cached
-  }
-
-  let localSeenRepos = refresh ? new Set() : new Set()
-  let page = 1
+async function collectProjects({
+  searchQuery,
+  sort,
+  target,
+  light,
+  seenRepos,
+  projects,
+  startPage = 1,
+}) {
+  let page = startPage
   let scanned = 0
-
-  const projects = []
 
   while (projects.length < target && scanned < MAX_SCAN) {
     const params = new URLSearchParams({
-      q: query || defaultQuery(),
+      q: searchQuery,
       sort: sort || 'stars',
       order: 'desc',
       per_page: String(FETCH_BUFFER),
@@ -453,8 +468,8 @@ export async function getProjects({ refresh = false, query, sort, perPage, light
     if (items.length === 0) break
 
     const candidates = items.filter((repo) => {
-      if (excluded(repo) || localSeenRepos.has(repoKey(repo))) return false
-      localSeenRepos.add(repoKey(repo))
+      if (excluded(repo) || seenRepos.has(repoKey(repo))) return false
+      seenRepos.add(repoKey(repo))
       return true
     })
 
@@ -492,10 +507,73 @@ export async function getProjects({ refresh = false, query, sort, perPage, light
     page += 1
   }
 
+  return projects
+}
+
+/** Enough steered results to be worth showing without topping up. */
+const STEER_SUFFICIENCY = 0.6
+
+// One `batch` consumes at most MAX_SCAN results, so the next batch has to start
+// where the previous one gave up or every refill would return the same repos.
+const PAGES_PER_BATCH = Math.ceil(MAX_SCAN / FETCH_BUFFER)
+// GitHub search only serves the first 1000 matches; wrap rather than page past it.
+const MAX_SEARCH_PAGE = Math.floor(1000 / FETCH_BUFFER)
+
+function startPageForBatch(batch) {
+  const offset = ((batch - 1) * PAGES_PER_BATCH) % MAX_SEARCH_PAGE
+  return offset + 1
+}
+
+export async function getProjects({
+  refresh = false,
+  query,
+  sort,
+  perPage,
+  light = false,
+  topic,
+  batch = 1,
+} = {}) {
+  const target = Math.min(perPage || DEFAULT_COUNT, 30)
+  const steerTopic = query ? null : sanitizeTopic(topic)
+  const batchNumber = Number.isFinite(batch) && batch > 0 ? Math.floor(batch) : 1
+  const startPage = startPageForBatch(batchNumber)
+  const cacheKey = `projects:${query || 'default'}:${steerTopic || 'none'}:${sort || 'stars'}:${target}:${light ? 'light' : 'full'}:${startPage}`
+
   if (!refresh) {
-    const cacheKey = `projects:${query || 'default'}:${sort || 'stars'}:${target}:${light ? 'light' : 'full'}`
-    cacheSet(cacheKey, projects)
+    const cached = cacheGet(cacheKey)
+    if (cached) return cached
   }
+
+  const seenRepos = new Set()
+  const projects = []
+
+  if (steerTopic) {
+    await collectProjects({
+      searchQuery: topicQuery(steerTopic),
+      sort,
+      target,
+      light,
+      seenRepos,
+      projects,
+      startPage,
+    })
+  }
+
+  // Top up from the general feed when the topic is too niche to fill a batch,
+  // so a steered refill never hands the deck fewer cards than an unsteered one.
+  if (projects.length < Math.ceil(target * STEER_SUFFICIENCY)) {
+    await collectProjects({
+      searchQuery: query || defaultQuery(),
+      sort,
+      target,
+      light,
+      seenRepos,
+      projects,
+      startPage,
+    })
+  }
+
+  if (!refresh) cacheSet(cacheKey, projects)
 
   return projects
 }

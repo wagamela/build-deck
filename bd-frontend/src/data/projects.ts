@@ -15,6 +15,8 @@ export interface Project {
   ownerAvatarUrl?: string
   description: string
   category: string
+  /** Raw GitHub topics; the recommendation model's strongest signal. */
+  topics?: string[]
   stars: number
   forks: number
   watchers: number
