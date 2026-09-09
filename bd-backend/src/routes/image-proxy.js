@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import sharp from 'sharp'
 import { assertProxyableImageUrl } from '../image-hosts.js'
+import { get as cacheGet, set as cacheSet } from '../cache.js'
 
 const router = Router()
 
@@ -9,6 +10,11 @@ const DEFAULT_WIDTH = 800
 const REQUEST_TIMEOUT_MS = 10_000
 const MAX_BYTES = 12 * 1024 * 1024
 const MAX_REDIRECTS = 4
+// Response carries `immutable`, so callers never re-request a given
+// url+width+format combination expecting fresh bytes; mirror that server-side
+// so repeat visitors (and repeat cards for a popular repo) skip the upstream
+// fetch and Sharp re-encode instead of paying for both on every request.
+const PROCESSED_CACHE_TTL_MS = 24 * 60 * 60 * 1000
 
 function parseWidth(value) {
   if (!value) return DEFAULT_WIDTH
@@ -86,6 +92,19 @@ router.get('/', async (req, res) => {
   const accept = req.get('accept') || ''
   const format = negotiateFormat(accept, fmt)
 
+  // Width only affects output for the resize branch below; keying the
+  // passthrough (no format / animated GIF) cache entry on it too would just
+  // fragment the cache across widths that all produce identical bytes.
+  const cacheKey = format ? `img:${url}:${width}:${format}` : `img:${url}:raw`
+  const cached = cacheGet(cacheKey)
+  if (cached) {
+    res.set('Cache-Control', 'public, max-age=86400, immutable')
+    res.set('Content-Type', cached.contentType)
+    res.set('Content-Length', String(cached.buffer.length))
+    res.set('Vary', 'Accept')
+    return res.send(cached.buffer)
+  }
+
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
 
@@ -120,8 +139,10 @@ router.get('/', async (req, res) => {
     // Animated GIFs stay as-is; re-encoding them to a still frame loses the
     // content, and the doc's advice there is to ship video, not a resize.
     if (!format || contentType === 'image/gif') {
+      const passthroughType = contentType.startsWith('image/') ? contentType : 'image/png'
+      cacheSet(cacheKey, { buffer, contentType: passthroughType }, PROCESSED_CACHE_TTL_MS)
       res.set('Cache-Control', 'public, max-age=86400, immutable')
-      res.set('Content-Type', contentType.startsWith('image/') ? contentType : 'image/png')
+      res.set('Content-Type', passthroughType)
       res.set('Content-Length', String(buffer.length))
       res.set('Vary', 'Accept')
       return res.send(buffer)
@@ -138,9 +159,11 @@ router.get('/', async (req, res) => {
     }
 
     const result = await pipeline.toBuffer()
+    const resultType = contentTypeFor(format)
+    cacheSet(cacheKey, { buffer: result, contentType: resultType }, PROCESSED_CACHE_TTL_MS)
 
     res.set('Cache-Control', 'public, max-age=86400, immutable')
-    res.set('Content-Type', contentTypeFor(format))
+    res.set('Content-Type', resultType)
     res.set('Content-Length', String(result.length))
     res.set('Vary', 'Accept')
     res.send(result)

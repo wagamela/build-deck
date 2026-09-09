@@ -291,6 +291,10 @@ function scoreImage(url, order) {
 
 const MAX_IMAGE_CANDIDATES = 3
 
+/** Extra candidates enriched per page beyond the exact remaining target, to
+ * absorb ones that fail enrichment or turn out to have no languages. */
+const ENRICH_BUFFER = 3
+
 async function fetchReadmeImages(fullName) {
   const [owner, repo] = fullName.split('/')
   const path = `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
@@ -478,8 +482,18 @@ async function collectProjects({
       continue
     }
 
+    // Enriching a candidate costs 3-4 GitHub API round trips (details,
+    // languages, contributors, README scrape), so only enrich as many as the
+    // remaining target needs. `ENRICH_BUFFER` absorbs candidates that come
+    // back with no languages or fail outright, without paying for the whole
+    // page: a `perPage: 1` request (the LCP-critical first card) used to
+    // enrich all ~15 candidates on the page in parallel just to keep one,
+    // which queued dozens of concurrent GitHub requests behind it.
+    const need = target - projects.length
+    const toEnrich = candidates.slice(0, need + ENRICH_BUFFER)
+
     const enrichments = await Promise.all(
-      candidates.map((repo) =>
+      toEnrich.map((repo) =>
         fetchRepoDetails(repo.full_name, { light }).then((details) => ({
           repo,
           details,
