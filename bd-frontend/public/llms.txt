@@ -4,8 +4,8 @@ BuildDeck is a Tinder-style discovery interface for discovering real software pr
 
 ## Get Started
 
-- **Homepage**: https://builddeck.xyz/
-- **GitHub Repository**: https://github.com/wagamela/build-deck
+- [BuildDeck Homepage](https://builddeck.xyz/)
+- [GitHub Repository](https://github.com/wagamela/build-deck)
 
 ## Learn More
 
