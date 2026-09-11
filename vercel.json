@@ -20,6 +20,15 @@
       ]
     },
     {
+      "source": "/llms.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/markdown"
+        }
+      ]
+    },
+    {
       "source": "/sitemap.xml",
       "headers": [
         {

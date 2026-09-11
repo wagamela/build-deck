@@ -1,0 +1,31 @@
+# BuildDeck
+
+BuildDeck is a Tinder-style discovery interface for discovering real software projects on GitHub. Swipe through trending repositories, like projects that interest you, and let BuildDeck's adaptive recommendation system learn your preferences in real time.
+
+## Get Started
+
+- **Homepage**: https://builddeck.xyz/
+- **GitHub Repository**: https://github.com/wagamela/build-deck
+
+## Learn More
+
+BuildDeck combines rapid card-based browsing with an intelligent recommendation algorithm that adapts to your interests. Each swipe teaches the system what projects you find valuable.
+
+**Key Features:**
+
+- Swipeable card deck interface for fast project discovery
+- Real-time preference learning based on your decisions
+- Integration with GitHub API for fresh project data
+- Keyboard shortcuts for power users (A/← to pass, D/→ to like)
+- Responsive design for desktop and mobile
+
+## Technologies
+
+Built with:
+- **Frontend**: React 19 + Vite + TypeScript + Tailwind CSS v4
+- **Backend**: Node.js + Express with GitHub API integration
+- **Design**: Violet Issue design system (dark, developer-focused aesthetic)
+
+---
+
+*Discover what developers are building.*
