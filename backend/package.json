@@ -1,7 +1,7 @@
 {
-  "name": "builddeck-backend",
+  "name": "reposwipe-backend",
   "version": "0.1.0",
-  "description": "BuildDeck backend API",
+  "description": "RepoSwipe backend API",
   "private": true,
   "type": "module",
   "main": "src/server.js",

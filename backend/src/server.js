@@ -4,5 +4,5 @@ import app from './app.js'
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
-  console.log(`BuildDeck API listening on http://localhost:${PORT}`)
+  console.log(`RepoSwipe API listening on http://localhost:${PORT}`)
 })

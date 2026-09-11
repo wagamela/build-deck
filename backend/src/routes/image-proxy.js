@@ -51,7 +51,7 @@ async function fetchImage(startUrl, signal) {
       signal,
       redirect: 'manual',
       headers: {
-        'User-Agent': 'BuildDeck-ImageProxy/1.0',
+        'User-Agent': 'RepoSwipe-ImageProxy/1.0',
         Accept: 'image/*,*/*;q=0.8',
       },
     })

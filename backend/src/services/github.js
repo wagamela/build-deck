@@ -79,7 +79,7 @@ async function githubFetch(path, { raw = false, accept = 'application/vnd.github
   const response = await fetch(`${GITHUB_API}${path}`, {
     headers: {
       Accept: accept,
-      'User-Agent': 'BuildDeck',
+      'User-Agent': 'RepoSwipe',
       ...authHeaders(),
     },
   })

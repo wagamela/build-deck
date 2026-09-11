@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**BuildDeck** is a Tinder-style discovery interface for discovering real software projects on GitHub. It's a monorepo containing:
-- **bd-frontend**: React + Vite + TypeScript + Tailwind CSS v4 + Oxlint
-- **bd-backend**: Node.js + Express API with GitHub integration and image proxy/processing
+**RepoSwipe** is a Tinder-style discovery interface for discovering real software projects on GitHub. It's a monorepo containing:
+- **rs-frontend**: React + Vite + TypeScript + Tailwind CSS v4 + Oxlint
+- **rs-backend**: Node.js + Express API with GitHub integration and image proxy/processing
 
 The core UX is a swipeable card deck where users can browse projects and make quick like/pass decisions.
 
@@ -14,20 +14,20 @@ The core UX is a swipeable card deck where users can browse projects and make qu
 
 ## Development Commands
 
-### Frontend (bd-frontend/)
+### Frontend (rs-frontend/)
 
 ```sh
-cd bd-frontend
+cd rs-frontend
 npm run dev      # Start Vite dev server (http://localhost:5173 by default)
 npm run build    # Build for production (tsc -b && vite build)
 npm run lint     # Run Oxlint
 npm run preview  # Preview production build locally
 ```
 
-### Backend (bd-backend/)
+### Backend (rs-backend/)
 
 ```sh
-cd bd-backend
+cd rs-backend
 npm run dev      # Start with nodemon (watches for changes, PORT defaults to 3000)
 npm start        # Start production server
 ```
@@ -128,7 +128,7 @@ See **DESIGN_AVOIDS_GUIDELINE.md** for 30 specific patterns to avoid and guiding
 
 ## TypeScript & Linting Configuration
 
-**TypeScript (bd-frontend/):**
+**TypeScript (rs-frontend/):**
 - Target: ES2023
 - Module: ESNext
 - JSX: react-jsx (automatic runtime)
@@ -179,7 +179,7 @@ See **DESIGN_AVOIDS_GUIDELINE.md** for 30 specific patterns to avoid and guiding
 
 ## Recommendation Algorithm
 
-The deck adapts to what the user likes. All model state lives in `bd-frontend/src/lib/taste.ts` and is session-only (an in-memory `TasteProfile`, never persisted).
+The deck adapts to what the user likes. All model state lives in `rs-frontend/src/lib/taste.ts` and is session-only (an in-memory `TasteProfile`, never persisted).
 
 **Feature extraction** – Each project becomes a weighted bag of features: `topic:` (from the repo's GitHub topics, weight 1.0), `lang:` (scaled by the language's byte share, 0.6), `owner:` (0.35), and `word:` (stopword-filtered tokens from the name and description, 0.3).
 
@@ -201,13 +201,13 @@ The debug panel (Ctrl+Shift+D) shows the current top topics and their weights.
 ## Common Development Tasks
 
 ### Adding a New API Endpoint
-1. Add route in `bd-backend/src/routes/index.js`.
-2. Create service function in `bd-backend/src/services/` if needed.
+1. Add route in `rs-backend/src/routes/index.js`.
+2. Create service function in `rs-backend/src/services/` if needed.
 3. Set appropriate Cache-Control headers.
 4. Call from frontend via `fetch("/api/your-endpoint")`.
 
 ### Modifying the Card Component
-- Edit `bd-frontend/src/components/SwipeCard.tsx`.
+- Edit `rs-frontend/src/components/SwipeCard.tsx`.
 - Ensure responsive sizing (uses Tailwind classes, no hardcoded pixel widths).
 - Images are lazy-loaded via `useImagePreloader()` hook.
 
@@ -232,7 +232,7 @@ The debug panel (Ctrl+Shift+D) shows the current top topics and their weights.
 
 - **No tailwind.config.js**: All Tailwind config is done via inline classes and values.
 - **Image proxy caching**: Backend uses in-memory cache; restart server clears it.
-- **Session storage**: Intro overlay state persists in sessionStorage (`bd-intro-seen`).
+- **Session storage**: Intro overlay state persists in sessionStorage (`rs-intro-seen`).
 - **Responsive design**: Uses Tailwind's `sm:` and `lg:` breakpoints; test on mobile.
 - **TypeScript strict mode**: No unused vars/params allowed; keep types tight.
 - **History data**: Limited by UI (list-based); no persistence across page reloads.
@@ -243,15 +243,15 @@ The debug panel (Ctrl+Shift+D) shows the current top topics and their weights.
 
 | File | Purpose |
 |------|---------|
-| `bd-frontend/src/App.tsx` | Main entry, state management, keyboard shortcuts |
-| `bd-frontend/src/components/DiscoveryDeck.tsx` | Card swipe logic, drag physics, animation |
-| `bd-frontend/src/hooks/useProjects.ts` | Pagination, refill, caching, rerank + query steering |
-| `bd-frontend/src/lib/taste.ts` | Taste profile, scoring, reranking, topic steering |
-| `bd-frontend/vite.config.ts` | Build config, API proxy setup |
-| `bd-frontend/tsconfig.app.json` | TypeScript strict settings |
-| `bd-backend/src/server.js` | Express app startup |
-| `bd-backend/src/routes/index.js` | API routes |
-| `bd-backend/src/services/github.js` | GitHub API integration |
+| `rs-frontend/src/App.tsx` | Main entry, state management, keyboard shortcuts |
+| `rs-frontend/src/components/DiscoveryDeck.tsx` | Card swipe logic, drag physics, animation |
+| `rs-frontend/src/hooks/useProjects.ts` | Pagination, refill, caching, rerank + query steering |
+| `rs-frontend/src/lib/taste.ts` | Taste profile, scoring, reranking, topic steering |
+| `rs-frontend/vite.config.ts` | Build config, API proxy setup |
+| `rs-frontend/tsconfig.app.json` | TypeScript strict settings |
+| `rs-backend/src/server.js` | Express app startup |
+| `rs-backend/src/routes/index.js` | API routes |
+| `rs-backend/src/services/github.js` | GitHub API integration |
 | `DESIGN.md` | Full design system spec |
 | `DESIGN_AVOIDS_GUIDELINE.md` | Anti-vibecoded design principles |
 

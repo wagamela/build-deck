@@ -19,7 +19,7 @@ const NotFoundPage = lazy(() => import("./components/NotFoundPage"));
 const IntroOverlay = lazy(() => import("./components/IntroOverlay"));
 const DebugPanel = lazy(() => import("./components/DebugPanel"));
 
-const BUILDDECK_REPO = "https://github.com/wagamela/build-deck";
+const REPOSWIPE_REPO = "https://github.com/wagamela/build-deck";
 const KEYBOARD_COOLDOWN_MS = 500;
 
 function DeckMark({ className }: { className?: string }) {
@@ -173,7 +173,7 @@ function ProjectPanel() {
     <div className="flex w-full flex-col rounded-lg border border-line bg-neutral p-4">
       <span className="eyebrow text-muted">GitHub</span>
       <a
-        href={BUILDDECK_REPO}
+        href={REPOSWIPE_REPO}
         target="_blank"
         rel="noreferrer"
         className="group mt-3 flex h-9 items-center justify-between gap-2 rounded-md border border-line bg-surface/40 px-3 transition-colors duration-100 hover:border-muted focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
@@ -181,7 +181,7 @@ function ProjectPanel() {
         <span className="flex min-w-0 items-center gap-2">
           <GitHubMark className="h-4 w-4 shrink-0 text-muted" />
           <span className="truncate text-[13px] font-medium text-text">
-            BuildDeck
+            RepoSwipe
           </span>
         </span>
         <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted transition-colors duration-100 group-hover:text-text" />
@@ -309,7 +309,7 @@ function Deck({
   const [activeIndex, setActiveIndex] = useState(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [showIntro, setShowIntro] = useState(
-    () => !window.sessionStorage.getItem("bd-intro-seen"),
+    () => !window.sessionStorage.getItem("rs-intro-seen"),
   );
   const [debugOpen, setDebugOpen] = useState(false);
   const [outlines, setOutlines] = useState(false);
@@ -321,7 +321,7 @@ function Deck({
   const lastKeyActionRef = useRef(0);
 
   const dismissIntro = useCallback(() => {
-    window.sessionStorage.setItem("bd-intro-seen", "1");
+    window.sessionStorage.setItem("rs-intro-seen", "1");
     setShowIntro(false);
   }, []);
 
@@ -363,7 +363,7 @@ function Deck({
   }, []);
 
   const handleShowIntro = useCallback(() => {
-    window.sessionStorage.removeItem("bd-intro-seen");
+    window.sessionStorage.removeItem("rs-intro-seen");
     setShowIntro(true);
   }, []);
 

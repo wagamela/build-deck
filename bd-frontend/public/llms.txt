@@ -1,15 +1,15 @@
-# BuildDeck
+# RepoSwipe
 
-BuildDeck is a Tinder-style discovery interface for discovering real software projects on GitHub. Swipe through trending repositories, like projects that interest you, and let BuildDeck's adaptive recommendation system learn your preferences in real time.
+RepoSwipe is a Tinder-style discovery interface for discovering real software projects on GitHub. Swipe through trending repositories, like projects that interest you, and let RepoSwipe's adaptive recommendation system learn your preferences in real time.
 
 ## Get Started
 
-- [BuildDeck Homepage](https://builddeck.xyz/)
+- [RepoSwipe Homepage](https://builddeck.xyz/)
 - [GitHub Repository](https://github.com/wagamela/build-deck)
 
 ## Learn More
 
-BuildDeck combines rapid card-based browsing with an intelligent recommendation algorithm that adapts to your interests. Each swipe teaches the system what projects you find valuable.
+RepoSwipe combines rapid card-based browsing with an intelligent recommendation algorithm that adapts to your interests. Each swipe teaches the system what projects you find valuable.
 
 **Key Features:**
 

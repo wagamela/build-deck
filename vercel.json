@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd bd-frontend && npm run build",
-  "installCommand": "cd bd-frontend && npm install",
-  "outputDirectory": "bd-frontend/dist",
+  "buildCommand": "cd rs-frontend && npm run build",
+  "installCommand": "cd rs-frontend && npm install",
+  "outputDirectory": "rs-frontend/dist",
   "framework": "vite",
   "rewrites": [
     {

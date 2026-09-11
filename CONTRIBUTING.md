@@ -1,8 +1,8 @@
-# Contributing to BuildDeck
+# Contributing to RepoSwipe
 
 ## Welcome
 
-BuildDeck is a Tinder-style app for discovering real software projects. It pulls
+RepoSwipe is a Tinder-style app for discovering real software projects. It pulls
 popular GitHub repositories, turns them into swipeable cards, and lets you like
 or skip your way through what other developers are building.
 
@@ -40,12 +40,12 @@ before investing time. That conversation is itself a helpful contribution.
 
 ## Development Setup
 
-BuildDeck is a monorepo with two independent packages:
+RepoSwipe is a monorepo with two independent packages:
 
 ```text
 build-deck/
-├── bd-frontend/   React + Vite + TypeScript + Tailwind CSS
-└── bd-backend/    Node.js + Express API (ES modules)
+├── rs-frontend/   React + Vite + TypeScript + Tailwind CSS
+└── rs-backend/    Node.js + Express API (ES modules)
 ```
 
 Each package has its own `package.json` and can be developed separately. The
@@ -64,7 +64,7 @@ cd build-deck
 ### 2. Frontend
 
 ```sh
-cd bd-frontend
+cd rs-frontend
 npm install
 npm run dev
 ```
@@ -77,14 +77,14 @@ shows a notice — useful for frontend-only work.
 ### 3. Backend
 
 ```sh
-cd bd-backend
+cd rs-backend
 npm install
 npm run dev
 ```
 
 The API listens on `http://localhost:3000`.
 
-Environment variables are read from `bd-backend/.env` (the file is gitignored
+Environment variables are read from `rs-backend/.env` (the file is gitignored
 and never committed). None are required to run the server, but these are
 supported:
 
@@ -96,7 +96,7 @@ GITHUB_TOKEN=your_github_personal_access_token
 PORT=3000
 ```
 
-To create the file, copy the example above into `bd-backend/.env`. Do not
+To create the file, copy the example above into `rs-backend/.env`. Do not
 commit a `.env` file or share your token.
 
 ### 4. Verify it works
@@ -164,7 +164,7 @@ The project has lightweight, practical standards — no heavy tooling is enforce
 beyond what's already set up.
 
 - **Linting.** The frontend is linted with **oxlint**:
-  `npm run lint` in `bd-frontend`. Run it before pushing and fix any warnings.
+  `npm run lint` in `rs-frontend`. Run it before pushing and fix any warnings.
   The backend has no linter configured.
 - **TypeScript.** The frontend is strict-friendly (`noUnusedLocals`,
   `noUnusedParameters` are on). The build type-checks automatically via
@@ -173,7 +173,7 @@ beyond what's already set up.
   you're editing (2-space indentation, quotes and semicolons matching the
   surrounding code, and existing patterns elsewhere in the file).
 - **Component structure.** Follow the existing layout: components in
-  `bd-frontend/src/components/`, hooks in `src/hooks/`, types and static data
+  `rs-frontend/src/components/`, hooks in `src/hooks/`, types and static data
   in `src/data/`. Reuse existing components and helpers instead of duplicating
   them.
 - **Styling.** The UI uses Tailwind CSS with the project's semantic design
@@ -230,7 +230,7 @@ Every PR will be reviewed for:
 - **Consistency** — does it fit the existing code and design conventions?
 - **Accessibility** — keyboard support, focus states, contrast.
 - **Performance** — nothing obviously wasteful or blocking.
-- **User experience** — does it feel like BuildDeck, not a detached addition?
+- **User experience** — does it feel like RepoSwipe, not a detached addition?
 
 Requested changes are a normal part of collaboration, not a rejection. The
 goal is a shared codebase that's pleasant for a single maintainer to keep up.
