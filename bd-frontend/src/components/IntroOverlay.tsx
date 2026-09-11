@@ -16,7 +16,7 @@ function Step({ icon, label, hint }: StepProps) {
       <span className="truncate text-[13px] font-medium text-text">
         {label}
       </span>
-      <span className="ml-auto shrink-0 font-mono text-[11px] text-muted/60">
+      <span className="ml-auto shrink-0 font-mono text-[11px] text-muted">
         {hint}
       </span>
     </li>

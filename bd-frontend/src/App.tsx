@@ -126,12 +126,12 @@ function PastCards({ history, onRevisit }: PastCardsProps) {
     <div className="flex h-full w-full flex-col rounded-lg border border-line bg-neutral p-3">
       <div className="flex items-center justify-between px-2 pb-3 pt-1">
         <span className="eyebrow text-muted">Past cards</span>
-        <span className="font-mono text-[0.7rem] text-muted/60">
+        <span className="font-mono text-[0.7rem] text-muted">
           {String(history.length).padStart(2, "0")}
         </span>
       </div>
       {history.length === 0 ? (
-        <p className="px-2 font-mono text-[0.7rem] leading-relaxed text-muted/60">
+        <p className="px-2 font-mono text-[0.7rem] leading-relaxed text-muted">
           Cards you swipe land here. Click one to flip it back.
         </p>
       ) : (
@@ -144,7 +144,7 @@ function PastCards({ history, onRevisit }: PastCardsProps) {
                   onClick={() => onRevisit(entry.index)}
                   className="group flex h-9 w-full items-center gap-3 rounded-md px-3 text-left transition-colors duration-100 hover:bg-surface focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-[-2px] focus-visible:outline-primary"
                 >
-                  <span className="font-mono text-[0.7rem] text-muted/60">
+                  <span className="font-mono text-[0.7rem] text-muted">
                     {String(entry.index + 1).padStart(2, "0")}
                   </span>
                   <span className="truncate text-[13px] font-medium text-text/70 transition-colors group-hover:text-text">
@@ -187,7 +187,7 @@ function ProjectPanel() {
         <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted transition-colors duration-100 group-hover:text-text" />
       </a>
 
-      <span className="eyebrow mt-4 border-t border-line pt-3 text-muted/60">
+      <span className="eyebrow mt-4 border-t border-line pt-3 text-muted">
         Find me
       </span>
       <div className="mt-2 flex items-center gap-2">

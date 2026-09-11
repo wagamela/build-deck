@@ -104,7 +104,7 @@ function ProjectPreview({
             <span className="text-[2.5rem] font-semibold leading-none text-secondary/60">
               {project.name.charAt(0)}
             </span>
-            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-muted/70">
+            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-muted">
               {project.category}
             </span>
           </div>
@@ -187,7 +187,7 @@ export default memo(function SwipeCard({
               <Star className="h-4 w-4 text-muted" />
               {formatCount(project.stars)}
             </p>
-            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
+            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted">
               Stars
             </p>
           </div>
@@ -197,7 +197,7 @@ export default memo(function SwipeCard({
               <GitFork className="h-4 w-4 text-muted" />
               {formatCount(project.forks)}
             </p>
-            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
+            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted">
               Forks
             </p>
           </div>
@@ -207,7 +207,7 @@ export default memo(function SwipeCard({
               <Eye className="h-4 w-4 text-muted" />
               {formatCount(project.watchers)}
             </p>
-            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted/60">
+            <p className="mt-0.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-muted">
               Watchers
             </p>
           </div>

@@ -102,25 +102,25 @@ export default function DebugPanel({
       </div>
 
       <div className="sidebar-scroll min-h-0 flex-1 overflow-y-auto p-4">
-        <h3 className="eyebrow text-muted/60">State</h3>
+        <h3 className="eyebrow text-muted">State</h3>
         <dl className="mt-2 space-y-1 font-mono text-[11px]">
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-muted/60">position</dt>
+            <dt className="text-muted">position</dt>
             <dd className="text-text">{activeIndex}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-muted/60">intro shown</dt>
+            <dt className="text-muted">intro shown</dt>
             <dd className="text-text">{showIntro ? "true" : "false"}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-muted/60">history</dt>
+            <dt className="text-muted">history</dt>
             <dd className="text-text">{history.length} entries</dd>
           </div>
         </dl>
 
-        <h3 className="eyebrow mt-5 text-muted/60">Taste profile</h3>
+        <h3 className="eyebrow mt-5 text-muted">Taste profile</h3>
         {tasteTopics.length === 0 ? (
-          <p className="mt-2 font-mono text-[11px] text-muted/60">
+          <p className="mt-2 font-mono text-[11px] text-muted">
             no signal yet
           </p>
         ) : (
@@ -131,7 +131,7 @@ export default function DebugPanel({
                 className="flex items-center gap-2 font-mono text-[11px] text-muted"
               >
                 <span className="truncate text-text/70">{topic}</span>
-                <span className="ml-auto shrink-0 text-muted/60">
+                <span className="ml-auto shrink-0 text-muted">
                   {weight.toFixed(2)}
                 </span>
               </li>
@@ -139,9 +139,9 @@ export default function DebugPanel({
           </ul>
         )}
 
-        <h3 className="eyebrow mt-5 text-muted/60">History</h3>
+        <h3 className="eyebrow mt-5 text-muted">History</h3>
         {history.length === 0 ? (
-          <p className="mt-2 font-mono text-[11px] text-muted/60">empty</p>
+          <p className="mt-2 font-mono text-[11px] text-muted">empty</p>
         ) : (
           <ol className="mt-2 flex flex-col gap-1">
             {[...history].reverse().map((entry) => (
@@ -158,13 +158,13 @@ export default function DebugPanel({
                   aria-hidden="true"
                 />
                 <span className="text-text/70">{entry.name}</span>
-                <span className="ml-auto text-muted/60">{entry.direction}</span>
+                <span className="ml-auto text-muted">{entry.direction}</span>
               </li>
             ))}
           </ol>
         )}
 
-        <h3 className="eyebrow mt-5 text-muted/60">Active project</h3>
+        <h3 className="eyebrow mt-5 text-muted">Active project</h3>
         <pre className="mt-2 max-h-40 overflow-auto rounded-md border border-line bg-background/50 p-2.5 font-mono text-[10px] leading-relaxed text-text/70">
           {JSON.stringify(project, null, 2)}
         </pre>

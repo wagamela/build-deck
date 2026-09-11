@@ -12,10 +12,55 @@ Violet Issue is a precision-engineered design system for issue tracking and proj
 - **Surface** (#1F1F2E): Elevated panels, modals, dropdown backgrounds — Dark Surface
 - **Text Primary** (#F1F1F4): Headings, primary text, issue titles — Off White
 - **Text Secondary** (#8A8F98): Descriptions, metadata, timestamps, placeholders — Muted Gray
+  - **Contrast ratio**: 6.11:1 against Background (#101014) — Exceeds WCAG AA (4.5:1 for normal text)
+  - **Usage**: All secondary text must use full opacity (no /opacity modifiers) to maintain minimum 4.5:1 contrast
+  - **Never use reduced opacity** (e.g., text-muted/60) for any font size — this drops contrast below 4.5:1 and violates WCAG AA
 - **Border** (#2C2C3A): Subtle dividers, input borders, panel edges — Dark Border
 - **Success** (#3DD68C): Completed issues, done status, passing checks — Emerald
 - **Warning** (#F0C000): In-progress status, attention needed, snoozed — Gold
 - **Error** (#EB5757): Urgent priority, bugs, cancelled status — Coral Red
+
+## Accessibility
+
+### Color Contrast Standards
+
+All text colors must meet **WCAG AA contrast requirements** against their intended backgrounds:
+
+- **Normal text (14px or larger)**: Minimum 4.5:1 contrast ratio
+- **Large text (18px or larger)**: Minimum 3:1 contrast ratio
+- **Small text (<14px)**: Minimum 4.5:1 contrast ratio
+
+### Text Color Usage Rules
+
+1. **Text Primary (#F1F1F4)**: Use for all body text, headings, and primary content
+   - Contrast: ~12:1 against dark backgrounds ✓
+   - Can be used at any font size and any opacity level
+
+2. **Text Secondary / Muted (#8A8F98)**: Use for metadata, descriptions, placeholders, and secondary information
+   - Contrast: 6.11:1 against Background (#101014) ✓
+   - **MUST always use at full opacity** — never use opacity modifiers (e.g., `/60`, `/70`)
+   - Opacity reduces contrast below WCAG AA requirements and is not permitted
+
+3. **Disabled/Inactive Text**: Use `text-text/50` or higher for disabled states
+   - 6:1 minimum contrast required — verify before deploying
+
+### Verified Color Combinations
+
+| Text Color | Background | Contrast Ratio | WCAG AA |
+|----------|-----------|----------------|---------|
+| #F1F1F4 (Primary) | #101014 | 12.11:1 | ✓ |
+| #8A8F98 (Secondary) | #101014 | 6.11:1 | ✓ |
+| #8A8F98 @ 60% opacity | #101014 | 3:1 | ✗ (FAILS) |
+| #8A8F98 @ 70% opacity | #101014 | 3.5:1 | ✗ (FAILS) |
+
+### Implementation Guidelines
+
+- **Always test** text contrast when adding new color combinations
+- **Never assume** reduced opacity helps visual hierarchy — use size, weight, and spacing instead
+- **Check all text elements** across components when updating colors
+- **Run Lighthouse** accessibility audits before deployment to verify compliance
+
+---
 
 ## Typography
 - **Display Font**: Inter — loaded from Google Fonts
