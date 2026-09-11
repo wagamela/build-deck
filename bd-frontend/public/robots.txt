@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://builddeck.xyz/sitemap.xml
