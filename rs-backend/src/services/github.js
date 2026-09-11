@@ -5,7 +5,7 @@ const GITHUB_API = 'https://api.github.com'
 const DEFAULT_COUNT = 12
 const FETCH_BUFFER = 18
 const MAX_SCAN = 90
-const SELF_REPO = 'wagamela/build-deck'
+const SELF_REPO = 'wagamela/repo-swipe'
 
 const LANGUAGE_COLORS = {
   Assembly: '#6E4C13',

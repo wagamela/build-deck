@@ -43,7 +43,7 @@ before investing time. That conversation is itself a helpful contribution.
 RepoSwipe is a monorepo with two independent packages:
 
 ```text
-build-deck/
+repo-swipe/
 ├── rs-frontend/   React + Vite + TypeScript + Tailwind CSS
 └── rs-backend/    Node.js + Express API (ES modules)
 ```
@@ -57,8 +57,8 @@ apps normally run together.
 ### 1. Clone the repository
 
 ```sh
-git clone https://github.com/wagamela/build-deck.git
-cd build-deck
+git clone https://github.com/wagamela/repo-swipe.git
+cd repo-swipe
 ```
 
 ### 2. Frontend

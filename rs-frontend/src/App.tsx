@@ -1,4 +1,11 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -19,7 +26,7 @@ const NotFoundPage = lazy(() => import("./components/NotFoundPage"));
 const IntroOverlay = lazy(() => import("./components/IntroOverlay"));
 const DebugPanel = lazy(() => import("./components/DebugPanel"));
 
-const REPOSWIPE_REPO = "https://github.com/wagamela/build-deck";
+const REPOSWIPE_REPO = "https://github.com/wagamela/repo-swipe";
 const KEYBOARD_COOLDOWN_MS = 500;
 
 function DeckMark({ className }: { className?: string }) {
@@ -106,7 +113,7 @@ function Wordmark() {
       <DeckMark className="h-9 w-9" />
       <div className="leading-none">
         <h1 className="font-display text-[1.4rem] text-text">
-          Build<span className="font-medium italic">Deck</span>
+          Repo<span className="font-medium italic">Swipe</span>
         </h1>
         <p className="mt-1.5 text-xs text-muted">
           Discover what developers are building
@@ -454,71 +461,73 @@ function Deck({
       ) : (
         <>
           <header className="flex items-center justify-between px-4 pt-4 sm:px-6 sm:pt-5 lg:px-10">
-        <Wordmark />
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setLeftPanelOpen(true)}
-            aria-label="Open past cards"
-            className="flex h-7 items-center gap-1.5 rounded-md border border-line px-2 text-[11px] font-medium text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text lg:hidden"
-          >
-            <Clock className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{String(history.length).padStart(2, "0")}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setRightPanelOpen(true)}
-            aria-label="Open project info"
-            className="flex h-7 items-center gap-1.5 rounded-md border border-line px-2 text-[11px] font-medium text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text lg:hidden"
-          >
-            <Link2 className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setDebugOpen((open) => !open)}
-            aria-label={debugOpen ? "Close debug mode" : "Open debug mode"}
-            className={`flex h-6 items-center rounded-full border border-line px-2 font-mono text-[10px] uppercase tracking-wider transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary ${
-              debugOpen
-                ? "border-primary/60 bg-primary/10 text-primary"
-                : "text-muted hover:border-primary/60 hover:text-text"
-            }`}
-          >
-            dev
-          </button>
-        </div>
-      </header>
-
-      <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-4 px-4 pb-4 pt-2 sm:gap-5 sm:px-6 sm:pb-6 lg:grid-cols-[13rem_minmax(0,1fr)_12rem] lg:gap-6 lg:px-10">
-        <aside className="hidden h-[min(64vh,38rem)] lg:flex">
-          <PastCards history={history} onRevisit={handleRevisit} />
-        </aside>
-
-        <section className="relative flex min-h-0 flex-col items-center justify-center gap-7">
-          {loading && projects.length === 0 ? (
-            <div className="relative h-[min(56vh,38rem)] w-[min(92vw,28.5rem)] sm:h-[min(64vh,38rem)]">
-              <div className="absolute inset-0 z-20 animate-card-arrive">
-                <SkeletonCard />
-              </div>
+            <Wordmark />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setLeftPanelOpen(true)}
+                aria-label="Open past cards"
+                className="flex h-7 items-center gap-1.5 rounded-md border border-line px-2 text-[11px] font-medium text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text lg:hidden"
+              >
+                <Clock className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">
+                  {String(history.length).padStart(2, "0")}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setRightPanelOpen(true)}
+                aria-label="Open project info"
+                className="flex h-7 items-center gap-1.5 rounded-md border border-line px-2 text-[11px] font-medium text-muted transition-colors duration-100 hover:border-primary/60 hover:text-text lg:hidden"
+              >
+                <Link2 className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setDebugOpen((open) => !open)}
+                aria-label={debugOpen ? "Close debug mode" : "Open debug mode"}
+                className={`flex h-6 items-center rounded-full border border-line px-2 font-mono text-[10px] uppercase tracking-wider transition-colors duration-100 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                  debugOpen
+                    ? "border-primary/60 bg-primary/10 text-primary"
+                    : "text-muted hover:border-primary/60 hover:text-text"
+                }`}
+              >
+                dev
+              </button>
             </div>
-          ) : (
-            <DiscoveryDeck
-              deck={projects}
-              controlsRef={controlsRef}
-              onDecision={handleDecision}
-              onActiveChange={handleActiveChange}
-              onRefill={onRefill}
-            />
-          )}
-          <ActionBar
-            onLike={() => controlsRef.current?.like()}
-            onPass={() => controlsRef.current?.skip()}
-          />
-        </section>
+          </header>
 
-        <aside className="hidden justify-self-end lg:flex">
-          <ProjectPanel />
-        </aside>
-      </div>
+          <div className="grid min-h-0 flex-1 grid-cols-1 items-center gap-4 px-4 pb-4 pt-2 sm:gap-5 sm:px-6 sm:pb-6 lg:grid-cols-[13rem_minmax(0,1fr)_12rem] lg:gap-6 lg:px-10">
+            <aside className="hidden h-[min(64vh,38rem)] lg:flex">
+              <PastCards history={history} onRevisit={handleRevisit} />
+            </aside>
+
+            <section className="relative flex min-h-0 flex-col items-center justify-center gap-7">
+              {loading && projects.length === 0 ? (
+                <div className="relative h-[min(56vh,38rem)] w-[min(92vw,28.5rem)] sm:h-[min(64vh,38rem)]">
+                  <div className="absolute inset-0 z-20 animate-card-arrive">
+                    <SkeletonCard />
+                  </div>
+                </div>
+              ) : (
+                <DiscoveryDeck
+                  deck={projects}
+                  controlsRef={controlsRef}
+                  onDecision={handleDecision}
+                  onActiveChange={handleActiveChange}
+                  onRefill={onRefill}
+                />
+              )}
+              <ActionBar
+                onLike={() => controlsRef.current?.like()}
+                onPass={() => controlsRef.current?.skip()}
+              />
+            </section>
+
+            <aside className="hidden justify-self-end lg:flex">
+              <ProjectPanel />
+            </aside>
+          </div>
         </>
       )}
 

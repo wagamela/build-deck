@@ -4,8 +4,8 @@ RepoSwipe is a Tinder-style discovery interface for discovering real software pr
 
 ## Get Started
 
-- [RepoSwipe Homepage](https://builddeck.xyz/)
-- [GitHub Repository](https://github.com/wagamela/build-deck)
+- [RepoSwipe Homepage](https://repo-swipe.xyz/)
+- [GitHub Repository](https://github.com/wagamela/repo-swipe)
 
 ## Learn More
 
