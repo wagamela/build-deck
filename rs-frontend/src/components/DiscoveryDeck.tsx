@@ -15,6 +15,10 @@ const MAX_TILT = 18;
 const FLYOUT_MS = 450;
 const REFILL_THRESHOLD = 8;
 const BACK_COLORS = ["#17171d", "#141419", "#191922", "#131318", "#16161c"];
+const VERDICT_COLOR = {
+  right: "var(--color-success)",
+  left: "var(--color-error)",
+} as const;
 
 export interface DeckControls {
   like: () => void;
@@ -108,6 +112,14 @@ export default function DiscoveryDeck({
   const tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, dx * TILT_PER_PX));
   const likeProgress = Math.min(Math.max(dx / SWIPE_THRESHOLD, 0), 1);
   const skipProgress = Math.min(Math.max(-dx / SWIPE_THRESHOLD, 0), 1);
+
+  // The card's own edge carries the verdict: it tints as you drag toward a
+  // threshold, then locks to full strength on commit and rides the flyout out.
+  // Button and keyboard swipes never touch dx, so `leaving` drives those.
+  const verdict = leaving ?? (dx > 0 ? "right" : dx < 0 ? "left" : null);
+  const verdictStrength = leaving
+    ? 1
+    : Math.max(likeProgress, skipProgress);
 
   useEffect(() => {
     onActiveChangeRef.current?.(topIndex);
@@ -225,15 +237,33 @@ export default function DiscoveryDeck({
               onTransitionEnd={handleTransitionEnd}
             >
               <SwipeCard project={project} imageLoaded={isLoaded(project.image)} />
+              {verdict && (
+                <div
+                  className={`pointer-events-none absolute inset-0 z-10 rounded-lg ${
+                    dragging ? "" : "transition-opacity duration-100 ease-out"
+                  }`}
+                  style={{
+                    opacity: verdictStrength,
+                    boxShadow: `inset 0 0 0 2px ${VERDICT_COLOR[verdict]}`,
+                  }}
+                  aria-hidden="true"
+                />
+              )}
               <div
-                className="pointer-events-none absolute right-4 top-5 z-10 rounded-md border-2 border-success bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-success"
-                style={{ transform: "rotate(12deg)", opacity: likeProgress }}
+                className="pointer-events-none absolute right-4 top-5 z-20 rounded-md border-2 border-success bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-success"
+                style={{
+                  transform: "rotate(12deg)",
+                  opacity: leaving === "right" ? 1 : likeProgress,
+                }}
               >
                 Like
               </div>
               <div
-                className="pointer-events-none absolute left-4 top-5 z-10 rounded-md border-2 border-error bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-error"
-                style={{ transform: "rotate(-12deg)", opacity: skipProgress }}
+                className="pointer-events-none absolute left-4 top-5 z-20 rounded-md border-2 border-error bg-background/90 px-3 py-1 text-sm font-bold uppercase tracking-[0.2em] text-error"
+                style={{
+                  transform: "rotate(-12deg)",
+                  opacity: leaving === "left" ? 1 : skipProgress,
+                }}
               >
                 Skip
               </div>
